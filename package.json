@@ -1,8 +1,9 @@
 {
   "name": "nbody",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Configure, simulate and visualize n-body interactions",
-  "main": "./bin/index.js",
+  "main": "./dist/index.js",
+  "types": "./dist/src/index.d.ts",
   "repository": "https://github.com/source-academy/nbody.git",
   "author": "Ketan Yeluri <e0603110@u.nus.edu>",
   "license": "Apache-2.0",
@@ -14,9 +15,10 @@
   ],
   "scripts": {
     "lint": "eslint --config src/.eslintrc.cjs --quiet .",
-    "docs": "typedoc --out dist/docs src",
+    "docs": "typedoc --out docs src",
+    "clean": "node scripts/clean.cjs",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "yarn lint && webpack && yarn docs",
+    "build": "yarn lint && yarn clean && webpack && yarn docs",
     "dev": "yarn build && yarn link"
   },
   "dependencies": {
