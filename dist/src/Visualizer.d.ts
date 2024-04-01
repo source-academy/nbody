@@ -1,6 +1,4 @@
 export interface Visualizer {
-    play(divId: string, timeScale: number): void;
-    pause(): void;
-    resume(): void;
+    start(divId: string, width: number, height: number, recordFor: number): void;
     stop(): void;
 }

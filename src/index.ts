@@ -2,33 +2,46 @@
  * NBody is a JS/TS library for simulating and visualizing n-body systems. It provides interfaces and implementations of forces, frame of reference transformations, simulation control, and multiple modes and paradigms of visualization.
  * @author Yeluri Ketan
  */
-export {
+import {
   CelestialBody,
 } from './CelestialBody';
 
-export { type Force } from './Force';
-export {
+import { type Force } from './Force';
+import {
   CentripetalForce, CombinedForce, Gravity,
 } from './library/Force';
 
-export {
+import {
   ExplicitEulerSim, RungeKutta4Sim,
   SemiImplicitEulerSim, VelocityVerletSim,
 } from './library/SimulateFunction';
-export { LambdaSim, type SimulateFunction } from './SimulateFunction';
+import { LambdaSim, type SimulateFunction } from './SimulateFunction';
 
-export { Simulation, type VisType } from './Simulation';
+import { Simulation, type VisType } from './Simulation';
 
-export { State } from './State';
+import { State } from './State';
 
-export {
+import {
   BodyCenterTransformation,
   CoMTransformation, RotateTransformation,
 } from './library/Transformation';
-export { LambdaTransformation, type Transformation } from './Transformation';
+import { LambdaTransformation, type Transformation } from './Transformation';
 
-export { Universe, type UniverseConfig } from './Universe';
+import { Universe, type UniverseConfig } from './Universe';
 
-export { RealTimeVisualizer, RealTimeVisualizer3D, RecordingVisualizer, RecordingVisualizer3D } from './library/Visualizer';
+import {
+  RealTimeVisualizer, RealTimeVisualizer3D,
+  RecordingVisualizer, RecordingVisualizer3D,
+} from './library/Visualizer';
 
-export { Vector3 } from 'three';
+import { Vector3 } from 'three';
+
+export {
+  BodyCenterTransformation, CelestialBody, CentripetalForce,
+  CombinedForce, CoMTransformation, ExplicitEulerSim, Gravity, LambdaSim, LambdaTransformation, RealTimeVisualizer,
+  RealTimeVisualizer3D,
+  RecordingVisualizer,
+  RecordingVisualizer3D,
+  RotateTransformation, RungeKutta4Sim,
+  SemiImplicitEulerSim, Simulation, State, Universe, Vector3, VelocityVerletSim, type Force, type SimulateFunction, type Transformation, type UniverseConfig, type VisType,
+};

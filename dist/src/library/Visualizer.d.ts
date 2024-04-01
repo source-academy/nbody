@@ -1,101 +1,121 @@
-import { type PlotType } from 'plotly.js-dist';
 import * as THREE from 'three';
 import { type Simulation } from '../Simulation';
-import { type State } from '../State';
 import { type Visualizer } from '../Visualizer';
+/**
+ * Container object for body trails in a 2D universe based in Plotly.
+ */
+declare class PlotlyUniverseTrail {
+    data: {
+        x: (number | null)[];
+        y: (number | null)[];
+        mode: 'markers';
+        marker: {
+            size: number;
+            color: string;
+        };
+    };
+    trailLength: number;
+    maxTrailLength: number;
+    trailInd: number;
+    /**
+     * Constructor for PlotlyUniverseTrail
+     * @param maxTrailLength max number of trail points to keep.
+     * @param color color of the trail.
+     */
+    constructor(maxTrailLength: number, color: string);
+    /**
+     * Add a trail point to the trail data, or replace an existing trail point if the max trail length has been reached.
+     * @param x x position.
+     * @param y y position.
+     */
+    addTrail(x: number, y: number): void;
+    /**
+     * Pop all trail points from the trail data.
+     */
+    popAllTrails(): void;
+}
 /**
  * 2D real-time visualizer using Plotly.
  */
 export declare class RealTimeVisualizer implements Visualizer {
     simulation: Simulation;
     divId: string;
-    type: PlotType;
-    readonly speeds: number[];
-    playing: boolean;
+    universeTrails: PlotlyUniverseTrail[];
     /**
      * Constructor for RealTimeVisualizer
      * @param simulation simulation object
      */
     constructor(simulation: Simulation);
     /**
-     * Simulate and play the visualization
-     * @param divId div id to render the visualization in
-     * @param timeScale initial time scale
+     * Adds default controls using lil-gui to the visualization.
+     * @param parentElement parent element to place the controller div in.
      */
-    play(divId: string, timeScale: number): void;
+    private addControls;
     /**
-     * Pause the simulation and visualization.
+     * Simulate and play the visualization.
+     * @param divId div id to render the visualization in.
+     * @param width width of the visualization.
+     * @param height height of the visualization.
      */
-    pause(): void;
-    /**
-     * Resume the simulation and visualization.
-     */
-    resume(): void;
+    start(divId: string, width: number, height: number): void;
     /**
      * Stop the simulation and visualization.
      */
     stop(): void;
 }
 /**
- * Container object for tracer points in a universe.
+ * Container object for body trails in a 3D universe based in Three.js.
  */
-declare class UniverseTracer {
-    traced: (THREE.Points | undefined)[];
-    traceInd: number;
-    maxTraceLength: number;
+declare class ThreeUniverseTrail {
     /**
-     * Constructor for UniverseTracer
-     * @param maxTraceLength max number of trace points to keep
+     * Singular Points object containing all trail points.
      */
-    constructor(maxTraceLength: number);
+    trails: THREE.Points;
+    trailInd: number;
+    trailLength: number;
+    maxTrailLength: number;
     /**
-     * Add a trace point at the given position to the scene, scaled appropriately. Remove an existing trace point if the max trace length has been reached.
-     * @param pos position to add trace point at
-     * @param scene scene to add trace point to
-     * @param scale scale to apply to position
+     * Constructor for ThreeUniverseTrail.
+     * @param maxTrailLength max number of trail points to keep.
+     * @param color color of the trace points.
+     * @param scene scene to add trail points object to.
+     * @param scale scale of the visualizationl, used to set the size of the trail point.
      */
-    addTrace(pos: THREE.Vector3, scene: THREE.Scene, scale: number): void;
+    constructor(maxTrailLength: number, color: string, scene: THREE.Scene, scale: number);
     /**
-     * Pop the last trace point from the scene.
-     * @param scene scene to remove trace point from.
-     * @returns true if a trace point was removed, false otherwise.
+     * Add a trail point at the given position to the scene. Replace an existing trail point if the max trail length has been reached.
+     * @param pos position to add trace point at.
      */
-    popTrace(scene: THREE.Scene): boolean;
+    addTrail(pos: THREE.Vector3): void;
     /**
-     * Pop all trace points from the scene.
-     * @param scene scene to remove trace points from.
+     * Pop all trail points.
      */
-    popAllTraces(scene: THREE.Scene): void;
+    popAllTrails(): void;
 }
 /**
  * 3D real-time visualizer using Three.js.
  */
 export declare class RealTimeVisualizer3D implements Visualizer {
     simulation: Simulation;
-    divId: string;
-    readonly speeds: number[];
-    playing: boolean;
-    universeTracers: UniverseTracer[];
-    maxTraceLength: number;
+    scene?: THREE.Scene;
+    universeTrailers: ThreeUniverseTrail[];
     /**
-     * Constructor for RealTimeVisualizer3D
-     * @param simulation simulation object
+     * Constructor for RealTimeVisualizer3D.
+     * @param simulation simulation object.
      */
     constructor(simulation: Simulation);
     /**
+     * Adds default controls to the visualization.
+     * @param parentElement parent element to place the controller div in.
+     */
+    private addControls;
+    /**
      * Simulate and play the visualization
      * @param divId div id to render the visualization in
-     * @param timeScale initial time scale
+     * @param width width of the visualization.
+     * @param height height of the visualization.
      */
-    play(divId: string, timeScale: number): void;
-    /**
-     * Pause the simulation and visualization.
-     */
-    pause(): void;
-    /**
-     * Resume the simulation and visualization.
-     */
-    resume(): void;
+    start(divId: string, width: number, height: number): void;
     /**
      * Stop the simulation and visualization.
      */
@@ -107,31 +127,27 @@ export declare class RealTimeVisualizer3D implements Visualizer {
 export declare class RecordingVisualizer implements Visualizer {
     simulation: Simulation;
     divId: string;
-    type: PlotType;
-    readonly speeds: number[];
-    playing: boolean;
+    universeTrails: PlotlyUniverseTrail[];
     /**
-     * Constructor for RecordingVisualizer
+     * Constructor for RealTimeVisualizer
      * @param simulation simulation object
-     * @param recordFor duration to record for
      */
-    constructor(simulation: Simulation, recordFor: number);
+    constructor(simulation: Simulation);
     /**
-     * Simulate, record and play the visualization on loop.
-     * @param divId div id to render the visualization in
-     * @param timeScale initial time scale
+     * Adds default controls using lil-gui to the visualization.
+     * @param parentElement parent element to place the controller div in.
      */
-    play(divId: string, timeScale: number): void;
+    private addControls;
     /**
-     * Pause the visualization.
+     * Simulate and play the visualization.
+     * @param divId div id to render the visualization in.
+     * @param width width of the visualization.
+     * @param height height of the visualization.
+     * @param recordFor number of seconds to record for..
      */
-    pause(): void;
+    start(divId: string, width: number, height: number, recordFor: number): void;
     /**
-     * Resume the visualization.
-     */
-    resume(): void;
-    /**
-     * Stop the visualization.
+     * Stop the simulation and visualization.
      */
     stop(): void;
 }
@@ -140,36 +156,28 @@ export declare class RecordingVisualizer implements Visualizer {
  */
 export declare class RecordingVisualizer3D implements Visualizer {
     simulation: Simulation;
-    divId: string;
-    readonly speeds: number[];
-    playing: boolean;
-    universeTracers: UniverseTracer[];
-    maxTraceLength: number;
-    recordFor: number;
-    recordedFrames: State[];
-    playInd: number;
+    scene?: THREE.Scene;
+    universeTrailers: ThreeUniverseTrail[];
     /**
-     * Constructor for RecordingVisualizer3D.
+     * Constructor for RealTimeVisualizer3D.
      * @param simulation simulation object.
-     * @param recordFor duration to record for.
      */
-    constructor(simulation: Simulation, recordFor: number);
+    constructor(simulation: Simulation);
     /**
-     * Simulate, record and play the visualization on loop.
+     * Adds default controls to the visualization.
+     * @param parentElement parent element to place the controller div in.
+     */
+    private addControls;
+    /**
+     * Simulate and play the visualization
      * @param divId div id to render the visualization in.
-     * @param timeScale initial time scale.
+     * @param width width of the visualization.
+     * @param height height of the visualization.
+     * @param recordFor number of seconds to record for.
      */
-    play(divId: string, timeScale: number): void;
+    start(divId: string, width: number, height: number, recordFor: number): void;
     /**
-     * Pause the visualization.
-     */
-    pause(): void;
-    /**
-     * Resume the visualization.
-     */
-    resume(): void;
-    /**
-     * Stop the visualization.
+     * Stop the simulation and visualization.
      */
     stop(): void;
 }

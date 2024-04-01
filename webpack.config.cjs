@@ -8,6 +8,7 @@ module.exports = {
     rules: [
       {
         test: /\.tsx?$/,
+        // use: "ts-loader",
         exclude: /node_modules/,
 
         loader: "ts-loader",
@@ -30,12 +31,20 @@ module.exports = {
     path: path.resolve(__dirname, "dist"),
     globalObject: "this",
     library: {
-      name: "celestial",
+      name: "nbody",
       type: "umd",
     },
   },
+  optimization: {
+    usedExports: false,
+  },
   externals: {
-    three: "three",
+    // three: "three",
+    // "three/examples/jsm/renderers/CSS2DRenderer":
+    //   "three/examples/jsm/renderers/CSS2DRenderer",
+    // "three/examples/jsm/Addons": "three/examples/jsm/Addons",
+    // "three/examples/jsm/libs/stats.module":
+    //   "three/examples/jsm/libs/stats.module",
     "plotly.js-dist": "plotly.js-dist",
   },
 };

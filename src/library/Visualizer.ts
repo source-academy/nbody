@@ -1,17 +1,8 @@
 import GUI from 'lil-gui';
-import Plotly, {
-  type Data,
-  type Layout,
-  type PlotType,
-  type SliderStep,
-} from 'plotly.js-dist';
+import Plotly, { type Data, type Layout } from 'plotly.js-dist';
 import * as THREE from 'three';
 import { OrbitControls, ViewHelper } from 'three/examples/jsm/Addons';
 import Stats from 'three/examples/jsm/libs/stats.module';
-import {
-  CSS2DObject,
-  CSS2DRenderer,
-} from 'three/examples/jsm/renderers/CSS2DRenderer';
 import { type Simulation } from '../Simulation';
 import { type State } from '../State';
 import { type Universe } from '../Universe';
@@ -33,14 +24,77 @@ function clipMinMax(x: number, min: number, max: number): number {
 }
 
 /**
+ * Container object for body trails in a 2D universe based in Plotly.
+ */
+class PlotlyUniverseTrail {
+  data: {
+    x: (number | null)[];
+    y: (number | null)[];
+    mode: 'markers';
+    marker: {
+      size: number;
+      color: string;
+    };
+  } = {
+      x: [],
+      y: [],
+      mode: 'markers',
+      marker: {
+        size: 1,
+        color: 'white',
+      },
+    };
+  trailLength: number;
+  maxTrailLength: number;
+  trailInd: number;
+
+  /**
+   * Constructor for PlotlyUniverseTrail
+   * @param maxTrailLength max number of trail points to keep.
+   * @param color color of the trail.
+   */
+  constructor(maxTrailLength: number, color: string) {
+    this.data.marker.color = color;
+    this.trailLength = 0;
+    this.maxTrailLength = maxTrailLength;
+    this.trailInd = 0;
+  }
+
+  /**
+   * Add a trail point to the trail data, or replace an existing trail point if the max trail length has been reached.
+   * @param x x position.
+   * @param y y position.
+   */
+  addTrail(x: number, y: number): void {
+    if (this.trailLength < this.maxTrailLength) {
+      this.data.x.push(x);
+      this.data.y.push(y);
+      this.trailLength++;
+    } else {
+      this.data.x[this.trailInd] = x;
+      this.data.y[this.trailInd] = y;
+      this.trailInd = (this.trailInd + 1) % this.trailLength;
+    }
+  }
+
+  /**
+   * Pop all trail points from the trail data.
+   */
+  popAllTrails(): void {
+    this.data.x = [];
+    this.data.y = [];
+    this.trailLength = 0;
+    this.trailInd = 0;
+  }
+}
+
+/**
  * 2D real-time visualizer using Plotly.
  */
 export class RealTimeVisualizer implements Visualizer {
   simulation: Simulation;
   divId: string = '';
-  type: PlotType = 'scatter';
-  readonly speeds = [0, 0.5, 1, 2, 4, 10, 20, 100, 1000, 10000, 1e5, 1e6, 1e7];
-  playing: boolean = false;
+  universeTrails: PlotlyUniverseTrail[] = [];
 
   /**
    * Constructor for RealTimeVisualizer
@@ -51,41 +105,62 @@ export class RealTimeVisualizer implements Visualizer {
   }
 
   /**
-   * Simulate and play the visualization
-   * @param divId div id to render the visualization in
-   * @param timeScale initial time scale
+   * Adds default controls using lil-gui to the visualization.
+   * @param parentElement parent element to place the controller div in.
    */
-  play(divId: string, timeScale: number) {
+  private addControls(parentElement: HTMLElement) {
+    const gui = new GUI({
+      container: parentElement,
+    });
+    gui.domElement.style.position = 'absolute';
+    gui.domElement.style.top = '0';
+    gui.domElement.style.left = '0';
+    gui.domElement.style.zIndex = '1000';
+
+    const config = this.simulation.controls;
+    gui.add(config, 'speed');
+    gui.add(config, 'showTrails')
+      .onChange((value: boolean) => {
+        if (value === false) {
+          this.universeTrails.forEach((ut) => ut.popAllTrails());
+        }
+        config.showTrails = value;
+      });
+    const showUniverseFolder = gui.addFolder('Show Universe');
+    showUniverseFolder.open(false);
+    this.simulation.universes.forEach((u, i) => {
+      showUniverseFolder
+        .add(config.showUniverse, u.label)
+        .onChange((value: boolean) => {
+          if (value === false) {
+            this.universeTrails[i].popAllTrails();
+          }
+          config.showUniverse[u.label] = value;
+        });
+    });
+  }
+
+  /**
+   * Simulate and play the visualization.
+   * @param divId div id to render the visualization in.
+   * @param width width of the visualization.
+   * @param height height of the visualization.
+   */
+  start(divId: string, width: number, height: number): void {
+    if (this.divId !== '') {
+      // throw new Error(
+      //   'Simulation already playing. Stop the current playtime before initiating a new one.',
+      // );
+      console.error('Simulation already playing. Stop the current playtime before initiating a new one.');
+      return;
+    }
     this.divId = divId;
-    this.playing = true;
     let element = document.getElementById(divId);
     if (element === null) {
       return;
     }
-
-    const steps: Partial<SliderStep>[] = this.speeds.map(
-      (speed: number): Partial<SliderStep> => ({
-        label: speed.toString(),
-        method: 'skip',
-      }),
-    );
-    const init_data: Data[] = this.simulation.universes.map(
-      (uni: Universe): Data => ({
-        x: uni.currState.bodies.map((body) => body.position.x),
-        y: uni.currState.bodies.map((body) => body.position.y),
-        z: uni.currState.bodies.map((body) => body.position.z),
-        type: this.type as PlotType,
-        mode: 'markers',
-        marker: {
-          color: uni.color,
-          sizemin: 6,
-          size: uni.currState.bodies.map((body) => Math.min(10, body.mass)),
-        },
-      }),
-    );
-
-    const width = element.clientWidth;
-    const height = element.clientHeight;
+    // const width = element.clientWidth;
+    // const height = element.clientHeight;
     let maxWidth = 0;
     let maxHeight = 0;
     this.simulation.universes.forEach((u) => u.currState.bodies.forEach((b) => {
@@ -108,212 +183,246 @@ export class RealTimeVisualizer implements Visualizer {
         autorange: false,
         range: [-(height / 2) / scale, height / 2 / scale],
       },
-      uirevision: 'true',
-      sliders: [
-        {
-          steps,
-          active: 0,
-        },
-      ],
+      // uirevision: 'true',
+      showlegend: false,
     };
 
-    Plotly.newPlot(divId, init_data, layout);
+    if (this.simulation.controller === 'default') {
+      this.addControls(element);
+    }
 
-    const framesPerSecond = 30;
-    const timePerFrameMs = 1000 / framesPerSecond;
-    if (animationId != null) return;
+    let stats: Stats | undefined;
+    if (this.simulation.showDebugInfo) {
+      stats = new Stats();
+      stats.dom.style.position = 'absolute';
+      stats.dom.style.bottom = '0px';
+      stats.dom.style.removeProperty('top');
+      element.appendChild(stats.dom);
+    }
+
+    const init_data: Data[] = this.simulation.universes.flatMap(
+      (uni: Universe): Data[] => {
+        const currTrail = new PlotlyUniverseTrail(
+          this.simulation.getMaxTrailLength(),
+          typeof uni.color === 'string' ? uni.color : uni.color[0],
+        );
+        this.universeTrails.push(currTrail);
+        const currData: Data = {
+          x: uni.currState.bodies.map((body) => body.position.x),
+          y: uni.currState.bodies.map((body) => body.position.y),
+          type: 'scatter',
+          mode: 'markers',
+          marker: {
+            color: uni.color,
+            sizemin: 6,
+            size: uni.currState.bodies.map((body) => Math.min(10, body.mass)),
+          },
+        };
+        if (this.simulation.getShowTrails()) {
+          uni.currState.bodies.forEach((b) => {
+            currTrail.addTrail(b.position.x, b.position.y);
+          });
+          return [currData, currTrail.data];
+        }
+        return [
+          currData,
+          {
+            x: [],
+            y: [],
+          },
+        ];
+      },
+    );
+
+    Plotly.newPlot(divId, init_data, layout, {
+      scrollZoom: true,
+      modeBarButtonsToRemove: [
+        'lasso2d',
+        'select2d',
+        'toImage',
+        'resetScale2d',
+      ],
+    });
+
+    const timePerFrame = 1000 / this.simulation.maxFrameRate;
+    if (animationId !== null) return;
     let lastPaintTimestampMs = 0;
-    let speed = timeScale;
+    let lastSimTimestampMs = 0;
 
     /**
      * Simulate a step in the simulation
+     * @param timestampMs current timestamp in milliseconds, sourced from requestAnimationFrame
      */
-    const step = () => {
-      // if (!this.playing) {
-      //   clearInterval(stepIntervalID);
-      //   return;
-      // }
-
-      // const currSimTimestampMs = performance.now();
-      if (speed !== 0) {
-        // lastSimTimestampsMs = currSimTimestampMs;
-
-        // const duration = currSimTimestampMs - lastSimTimestampsMs;
-        this.simulation.simulateStep(0.016 * speed);
-        // lastSimTimestampsMs = currSimTimestampMs;
-        // console.log(`stepping ${Math.floor(performance.now() / 1000)}`);
-      }
+    const step = (timestampMs: number): void => {
+      this.simulation.simulateStep(
+        (this.simulation.controls.speed
+          * Math.min(timestampMs - lastSimTimestampMs, 33.33))
+          / 1000,
+      );
+      lastSimTimestampMs = timestampMs;
     };
 
-    let count = 0;
     /**
      * Paint the visualization
      * @param timestampMs current timestamp in milliseconds, provided by requestAnimationFrame
      */
     const paint = (timestampMs: number) => {
-      speed
-        = this.speeds[
-          parseInt(
-            // @ts-ignore
-            document.getElementById(divId)?.layout?.sliders[0].active,
-          )
-        ];
+      if (
+        this.simulation.controls.speed === 0
+        || this.simulation.controls.paused
+      ) {
+        animationId = requestAnimationFrame(paint);
+        return;
+      }
+      step(timestampMs);
 
       if (
-        speed === 0
-        || !this.playing
-        // || timestampMs - lastPaintTimestampMs < timePerFrameMs
+        timePerFrame > 0
+        && timestampMs - lastPaintTimestampMs < timePerFrame
       ) {
         animationId = requestAnimationFrame(paint);
         return;
       }
       lastPaintTimestampMs = timestampMs;
-      step();
 
-      const new_data = this.simulation.universes.map((uni: Universe) => ({
-        x: uni.currState.bodies.map((body) => body.position.x),
-        y: uni.currState.bodies.map((body) => body.position.y),
-        z: uni.currState.bodies.map((body) => body.position.z),
-        hovertext: uni.currState.bodies.map((body) => body.label),
-        color: uni.color,
-        marker: {
-          size: uni.currState.bodies.map((body) => Math.min(10, body.mass)),
-        },
-      }));
+      const new_data = this.simulation.universes.flatMap(
+        (uni: Universe, i: number): Data[] => {
+          if (!this.simulation.getShowUniverse(uni.label)) {
+            return [
+              {
+                x: [],
+                y: [],
+              },
+              {},
+            ];
+          }
+          const currData: Data = {
+            x: uni.currState.bodies.map((body) => body.position.x),
+            y: uni.currState.bodies.map((body) => body.position.y),
+            hovertext: uni.currState.bodies.map((body) => body.label),
+            marker: {
+              size: uni.currState.bodies.map((body) => Math.min(10, body.mass)),
+              color: uni.color,
+              sizemin: 6,
+            },
+            mode: 'markers',
+          };
 
-      // @ts-ignore
-      Plotly.animate(
-        divId,
-        {
-          data: new_data,
-        },
-        {
-          transition: {
-            duration: 0,
-          },
-          frame: {
-            duration: 0,
-            redraw: false,
-          },
+          let trailData: Data = {};
+          if (this.simulation.getShowTrails()) {
+            const currTrail = this.universeTrails[i];
+            uni.currState.bodies.forEach((b) => {
+              currTrail.addTrail(b.position.x, b.position.y);
+            });
+            trailData = currTrail.data;
+          }
+          return [currData, trailData];
         },
       );
 
+      Plotly.react(divId, new_data, layout);
+      if (this.simulation.showDebugInfo && stats) {
+        stats.update();
+      }
       animationId = requestAnimationFrame(paint);
     };
 
-    // let lastSimTimestampsMs = performance.now();
-
-    // let isTabActive;
-    // window.onfocus = function () {
-    //   isTabActive = true;
-    // };
-    // window.onblur = function () {
-    //   isTabActive = false;
-    // };
-
-    // let stepIntervalID: number = -1;
-
-    requestAnimationFrame(paint);
-    // stepIntervalID = window.setInterval(step, 10);
-  }
-
-  /**
-   * Pause the simulation and visualization.
-   */
-  pause(): void {
-    this.playing = false;
-  }
-
-  /**
-   * Resume the simulation and visualization.
-   */
-  resume(): void {
-    this.playing = true;
+    animationId = requestAnimationFrame(paint);
   }
 
   /**
    * Stop the simulation and visualization.
    */
   stop(): void {
-    this.playing = false;
     Plotly.purge(this.divId);
     this.divId = '';
+    this.universeTrails.forEach((ut) => {
+      ut.popAllTrails();
+    });
+    this.universeTrails = [];
   }
 }
 
 /**
- * Container object for tracer points in a universe.
+ * Container object for body trails in a 3D universe based in Three.js.
  */
-class UniverseTracer {
-  traced: (THREE.Points | undefined)[];
-  traceInd: number;
-  maxTraceLength: number;
+class ThreeUniverseTrail {
+  /**
+   * Singular Points object containing all trail points.
+   */
+  trails: THREE.Points;
+  trailInd: number;
+  trailLength: number;
+  maxTrailLength: number;
 
   /**
-   * Constructor for UniverseTracer
-   * @param maxTraceLength max number of trace points to keep
+   * Constructor for ThreeUniverseTrail.
+   * @param maxTrailLength max number of trail points to keep.
+   * @param color color of the trace points.
+   * @param scene scene to add trail points object to.
+   * @param scale scale of the visualizationl, used to set the size of the trail point.
    */
-  constructor(maxTraceLength: number) {
-    this.traced = [];
-    this.traceInd = 0;
-    this.maxTraceLength = maxTraceLength;
-  }
-
-  /**
-   * Add a trace point at the given position to the scene, scaled appropriately. Remove an existing trace point if the max trace length has been reached.
-   * @param pos position to add trace point at
-   * @param scene scene to add trace point to
-   * @param scale scale to apply to position
-   */
-  addTrace(pos: THREE.Vector3, scene: THREE.Scene, scale: number) {
-    const dotGeometry = new THREE.BufferGeometry();
-    dotGeometry.setAttribute(
+  constructor(
+    maxTrailLength: number,
+    color: string,
+    scene: THREE.Scene,
+    scale: number,
+  ) {
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute(
       'position',
-      new THREE.BufferAttribute(new Float32Array(pos.toArray()), 3),
+      new THREE.BufferAttribute(new Float32Array(0), 3),
     );
-    const dotMaterial = new THREE.PointsMaterial({
-      size: 0.005 * scale,
-      color: 0xffffff,
-    });
-    const dot = new THREE.Points(dotGeometry, dotMaterial);
-    scene.add(dot);
+    this.trails = new THREE.Points(
+      geometry,
+      new THREE.PointsMaterial({
+        color,
+        size: 0.005 * scale,
+      }),
+    );
+    scene.add(this.trails);
+    this.trailInd = 0;
+    this.trailLength = 0;
+    this.maxTrailLength = maxTrailLength;
+  }
 
-    if (this.traced.length < this.maxTraceLength) {
-      this.traced.push(dot);
-      this.traceInd = this.traced.length - 1;
+  /**
+   * Add a trail point at the given position to the scene. Replace an existing trail point if the max trail length has been reached.
+   * @param pos position to add trace point at.
+   */
+  addTrail(pos: THREE.Vector3) {
+    if (this.trailLength < this.maxTrailLength) {
+      this.trails.visible = true;
+      this.trailLength++;
+      const posArray = new Float32Array(this.trailLength * 3);
+      posArray.set(this.trails.geometry.attributes.position.array);
+      posArray.set(pos.toArray(), this.trailLength * 3 - 3);
+      this.trails.geometry.setAttribute(
+        'position',
+        new THREE.BufferAttribute(posArray, 3),
+      );
+      this.trails.geometry.attributes.position.needsUpdate = true;
     } else {
-      this.traceInd = (this.traceInd + 1) % this.maxTraceLength;
-      if (this.traced[this.traceInd] !== undefined) {
-        scene.remove(this.traced[this.traceInd]!);
-      }
-      this.traced[this.traceInd] = dot;
+      this.trails.geometry.attributes.position.array.set(
+        pos.toArray(),
+        this.trailInd * 3,
+      );
+      this.trailInd = (this.trailInd + 1) % this.maxTrailLength;
+      this.trails.geometry.attributes.position.needsUpdate = true;
     }
   }
 
   /**
-   * Pop the last trace point from the scene.
-   * @param scene scene to remove trace point from.
-   * @returns true if a trace point was removed, false otherwise.
+   * Pop all trail points.
    */
-  popTrace(scene: THREE.Scene): boolean {
-    if (this.traced[this.traceInd] === undefined) {
-      return false;
-    }
-    scene.remove(this.traced[this.traceInd]!);
-    this.traced[this.traceInd] = undefined;
-    this.traceInd
-        = this.traceInd === 0 ? this.traced.length - 1 : this.traceInd - 1;
-    return true;
-  }
-
-  /**
-   * Pop all trace points from the scene.
-   * @param scene scene to remove trace points from.
-   */
-  popAllTraces(scene: THREE.Scene) {
-    while (this.popTrace(scene)) {
-      // intentionally empty
-    }
+  popAllTrails(): void {
+    this.trails.visible = false;
+    this.trails.geometry.setAttribute(
+      'position',
+      new THREE.BufferAttribute(new Float32Array(0), 3),
+    );
+    this.trailInd = 0;
+    this.trailLength = 0;
   }
 }
 
@@ -322,34 +431,76 @@ class UniverseTracer {
  */
 export class RealTimeVisualizer3D implements Visualizer {
   simulation: Simulation;
-  divId: string = '';
-  readonly speeds = [0, 0.5, 1, 2, 4, 10, 100, 1000, 10000];
-  playing: boolean = false;
-  universeTracers: UniverseTracer[] = [];
-  maxTraceLength = 200;
+  scene?: THREE.Scene;
+  universeTrailers: ThreeUniverseTrail[] = [];
 
   /**
-   * Constructor for RealTimeVisualizer3D
-   * @param simulation simulation object
+   * Constructor for RealTimeVisualizer3D.
+   * @param simulation simulation object.
    */
   constructor(simulation: Simulation) {
     this.simulation = simulation;
   }
 
   /**
+   * Adds default controls to the visualization.
+   * @param parentElement parent element to place the controller div in.
+   */
+  private addControls(parentElement: HTMLElement) {
+    const gui = new GUI({
+      container: parentElement,
+    });
+    gui.domElement.style.position = 'absolute';
+    gui.domElement.style.top = '0';
+    gui.domElement.style.left = '0';
+    gui.domElement.style.zIndex = '1000';
+
+    const config = this.simulation.controls;
+    gui.add(config, 'speed');
+    gui.add(config, 'showTrails')
+      .onChange((value: boolean) => {
+        if (value === false) {
+          this.universeTrailers.forEach((ut) => {
+            ut.popAllTrails();
+          });
+        }
+        config.showTrails = value;
+      });
+    const showUniverseFolder = gui.addFolder('Show Universe');
+    showUniverseFolder.open(false);
+    this.simulation.universes.forEach((u, i) => {
+      showUniverseFolder
+        .add(config.showUniverse, u.label)
+        .onChange((value: boolean) => {
+          if (value === false) {
+            this.universeTrailers[i].popAllTrails();
+          }
+          config.showUniverse[u.label] = value;
+        });
+    });
+  }
+
+  /**
    * Simulate and play the visualization
    * @param divId div id to render the visualization in
-   * @param timeScale initial time scale
+   * @param width width of the visualization.
+   * @param height height of the visualization.
    */
-  play(divId: string, timeScale: number) {
-    this.divId = divId;
-    this.playing = true;
+  start(divId: string, width: number, height: number): void {
+    if (this.scene !== undefined) {
+      // throw new Error(
+      //   'Simulation already playing. Stop the current playtime before initiating a new one.',
+      // );
+      console.error('Simulation already playing. Stop the current playtime before initiating a new one.');
+      return;
+    }
     let element = document.getElementById(divId);
     if (element === null) {
       return;
     }
-    const width = element.clientWidth;
-    const height = element.clientHeight;
+    element.style.position = 'relative';
+    // const width = element.clientWidth;
+    // const height = element.clientHeight;
     let maxWidth = 0;
     let maxHeight = 0;
     this.simulation.universes.forEach((u) => u.currState.bodies.forEach((b) => {
@@ -358,7 +509,7 @@ export class RealTimeVisualizer3D implements Visualizer {
     }));
     const scale = 0.5 * Math.min(height / maxHeight, width / maxWidth);
 
-    const scene = new THREE.Scene();
+    this.scene = new THREE.Scene();
 
     const camera = new THREE.OrthographicCamera(
       width / -2,
@@ -371,51 +522,62 @@ export class RealTimeVisualizer3D implements Visualizer {
     camera.position.set(0, 0, Math.max(width, height));
 
     const renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(width, height);
     renderer.autoClear = false;
     element.appendChild(renderer.domElement);
-    const stats = new Stats();
-    element.parentNode?.appendChild(stats.dom);
 
-    const earthDiv = document.createElement('div');
-    earthDiv.className = 'label';
-    earthDiv.textContent = 'Earthhgkjfdghkjfgh';
-    earthDiv.style.backgroundColor = 'transparent';
-    earthDiv.style.color = 'white';
-    earthDiv.style.fontFamily = 'sans-serif';
-    earthDiv.style.background = 'rgba(0, 0, 0, 0.6)';
+    let stats: Stats | undefined;
+    if (this.simulation.showDebugInfo) {
+      stats = new Stats();
+      stats.dom.style.position = 'absolute';
+      stats.dom.style.right = '0px';
+      stats.dom.style.removeProperty('left');
+      element.appendChild(stats.dom);
+    }
 
-    const earthLabel = new CSS2DObject(earthDiv);
-    earthLabel.position.set(0, 0, 0);
-    earthLabel.center.set(0, 1);
-    // arr[0].add(earthLabel);
-    earthLabel.layers.set(0);
-    const labelRenderer = new CSS2DRenderer();
-    labelRenderer.setSize(width, height);
-    labelRenderer.domElement.style.position = 'absolute';
-    labelRenderer.domElement.style.top = '0px';
-    element.appendChild(labelRenderer.domElement);
+    if (this.simulation.controller === 'default') {
+      this.addControls(element);
+    }
 
-    const orbitControls = new OrbitControls(camera, labelRenderer.domElement);
+    // const earthDiv = document.createElement('div');
+    // earthDiv.className = 'label';
+    // earthDiv.textContent = 'Earthhgkjfdghkjfgh';
+    // earthDiv.style.backgroundColor = 'transparent';
+    // earthDiv.style.color = 'white';
+    // earthDiv.style.fontFamily = 'sans-serif';
+    // earthDiv.style.background = 'rgba(0, 0, 0, 0.6)';
+
+    // const earthLabel = new CSS2DObject(earthDiv);
+    // earthLabel.position.set(0, 0, 0);
+    // earthLabel.center.set(0, 1);
+    // // arr[0].add(earthLabel);
+    // earthLabel.layers.set(0);
+    // const labelRenderer = new CSS2DRenderer();
+    // labelRenderer.setSize(width, height);
+    // labelRenderer.domElement.style.position = 'absolute';
+    // labelRenderer.domElement.style.top = '0px';
+    // element.appendChild(labelRenderer.domElement);
+
+    const orbitControls = new OrbitControls(camera, renderer.domElement);
     orbitControls.listenToKeyEvents(window);
     orbitControls.update();
 
     const axesHelper = new THREE.AxesHelper(width);
-    scene.add(axesHelper);
-    // const gridHelper = new THREE.GridHelper(
-    //   width,
-    //   20,
-    //   new THREE.Color('hsl(0, 0%, 70%)'),
-    //   new THREE.Color('hsl(0, 0%, 40%)'),
-    // );
-    // scene.add(gridHelper);
-    const viewHelper = new ViewHelper(camera, labelRenderer.domElement);
+    this.scene.add(axesHelper);
+    const viewHelper = new ViewHelper(camera, renderer.domElement);
 
     // var m: Map<string, THREE.LineSegments> = new Map();
     let arr: THREE.LineSegments[] = [];
 
     this.simulation.universes.forEach((u) => {
-      this.universeTracers.push(new UniverseTracer(this.maxTraceLength));
+      this.universeTrailers.push(
+        new ThreeUniverseTrail(
+          this.simulation.maxTrailLength,
+          typeof u.color === 'string' ? u.color : u.color[0],
+          this.scene!,
+          scale,
+        ),
+      );
       u.currState.bodies.forEach((b) => {
         const sph = new THREE.SphereGeometry(
           clipMinMax(Math.log2(b.mass) - 70, 10, 40),
@@ -430,7 +592,7 @@ export class RealTimeVisualizer3D implements Visualizer {
             color: new THREE.Color(u.color),
           }),
         );
-        scene.add(line);
+        this.scene!.add(line);
         line.position.copy(b.position.clone()
           .multiplyScalar(scale));
         // m.set(u.label + " " + b.label, line);
@@ -439,43 +601,9 @@ export class RealTimeVisualizer3D implements Visualizer {
     });
     // arr[0].add(earthLabel)
 
-    const fps = 30;
+    const timePerFrame = 1000 / this.simulation.maxFrameRate;
     let lastSimTimestampMs = performance.now();
-
-    const gui = new GUI();
-    let config: {
-      'Time Scale': number;
-      showTracers: boolean;
-      showUniverse: { [key: string]: boolean };
-    } = {
-      'Time Scale': timeScale,
-      'showTracers': true,
-      'showUniverse': {},
-    };
-
-    gui.add(config, 'Time Scale');
-    gui.add(config, 'showTracers')
-      .onChange((value: boolean) => {
-        if (value === false) {
-          this.universeTracers.forEach((ut) => {
-            ut.popAllTraces(scene);
-          });
-        }
-        config.showTracers = value;
-      });
-    const showUniverseFolder = gui.addFolder('Show Universe');
-    showUniverseFolder.open(false);
-    this.simulation.universes.forEach((u, i) => {
-      config.showUniverse[u.label] = true;
-      showUniverseFolder
-        .add(config.showUniverse, u.label)
-        .onChange((value: boolean) => {
-          if (value === false) {
-            this.universeTracers[i].popAllTraces(scene);
-          }
-          config.showUniverse[u.label] = value;
-        });
-    });
+    let lastPaint = performance.now();
 
     /**
      * Simulate a step in the simulation
@@ -483,42 +611,56 @@ export class RealTimeVisualizer3D implements Visualizer {
      */
     const step = (timestampMs: number) => {
       this.simulation.simulateStep(
-        (config['Time Scale']
-          * Math.min(timestampMs - lastSimTimestampMs, 10))
+        (this.simulation.controls.speed
+          * Math.min(timestampMs - lastSimTimestampMs, 16.67))
           / 1000,
       );
       lastSimTimestampMs = timestampMs;
     };
-
-    let lastPaint = performance.now();
 
     /**
      * Paint the visualization
      * @param timestampMs current timestamp in milliseconds, provided by requestAnimationFrame
      */
     const paint = (timestampMs: number) => {
-      if (config['Time Scale'] === 0 || !this.playing) {
+      if (
+        this.simulation.controls.speed === 0
+        || this.simulation.controls.paused
+      ) {
         requestAnimationFrame(paint);
+        renderer.clear();
+        renderer.render(this.scene!, camera);
+        viewHelper.render(renderer);
+        // labelRenderer.render(scene, camera);
+        orbitControls.update();
         return;
       }
       step(timestampMs);
 
-      // if (timestampMs - lastPaint < 1000 / fps) {
-      //   requestAnimationFrame(paint);
-      //   return;
-      // }
+      if (timePerFrame > 0 && timestampMs - lastPaint < timePerFrame) {
+        requestAnimationFrame(paint);
+        renderer.clear();
+        renderer.render(this.scene!, camera);
+        viewHelper.render(renderer);
+        // labelRenderer.render(scene, camera);
+        orbitControls.update();
+        return;
+      }
+
       lastPaint = timestampMs;
-      stats.update();
+      if (this.simulation.showDebugInfo && stats) {
+        stats.update();
+      }
 
       let ind = 0;
       this.simulation.universes.forEach((u, i) => {
-        if (config.showUniverse[u.label]) {
+        if (this.simulation.controls.showUniverse[u.label]) {
           u.currState.bodies.forEach((b) => {
             arr[ind].visible = true;
             arr[ind].position.copy(b.position.clone()
               .multiplyScalar(scale));
-            if (config.showTracers) {
-              this.universeTracers[i].addTrace(arr[ind].position, scene, scale);
+            if (this.simulation.controls.showTrails) {
+              this.universeTrailers[i].addTrail(arr[ind].position);
             }
             ind++;
           });
@@ -531,7 +673,7 @@ export class RealTimeVisualizer3D implements Visualizer {
       });
       requestAnimationFrame(paint);
       renderer.clear();
-      renderer.render(scene, camera);
+      renderer.render(this.scene!, camera);
       viewHelper.render(renderer);
       // labelRenderer.render(scene, camera);
       orbitControls.update();
@@ -541,26 +683,15 @@ export class RealTimeVisualizer3D implements Visualizer {
   }
 
   /**
-   * Pause the simulation and visualization.
-   */
-  pause(): void {
-    this.playing = false;
-  }
-
-  /**
-   * Resume the simulation and visualization.
-   */
-  resume(): void {
-    this.playing = true;
-  }
-
-
-  /**
    * Stop the simulation and visualization.
    */
   stop(): void {
-    this.playing = false;
-    this.divId = '';
+    this.scene?.clear();
+    this.scene = undefined;
+    this.universeTrailers.forEach((ut) => {
+      ut.popAllTrails();
+    });
+    this.universeTrailers = [];
   }
 }
 
@@ -570,55 +701,74 @@ export class RealTimeVisualizer3D implements Visualizer {
 export class RecordingVisualizer implements Visualizer {
   simulation: Simulation;
   divId: string = '';
-  type: PlotType = 'scatter';
-  readonly speeds = [0, 0.5, 1, 2, 4, 10, 20, 100, 1000, 10000, 1e5, 1e6, 1e7];
-  playing: boolean = false;
+  universeTrails: PlotlyUniverseTrail[] = [];
 
   /**
-   * Constructor for RecordingVisualizer
+   * Constructor for RealTimeVisualizer
    * @param simulation simulation object
-   * @param recordFor duration to record for
    */
-  constructor(simulation: Simulation, recordFor: number) {
+  constructor(simulation: Simulation) {
     this.simulation = simulation;
   }
 
   /**
-   * Simulate, record and play the visualization on loop.
-   * @param divId div id to render the visualization in
-   * @param timeScale initial time scale
+   * Adds default controls using lil-gui to the visualization.
+   * @param parentElement parent element to place the controller div in.
    */
-  play(divId: string, timeScale: number) {
+  private addControls(parentElement: HTMLElement): void {
+    const gui = new GUI({
+      container: parentElement,
+    });
+    gui.domElement.style.position = 'absolute';
+    gui.domElement.style.top = '0';
+    gui.domElement.style.left = '0';
+    gui.domElement.style.zIndex = '1000';
+
+    const config = this.simulation.controls;
+    gui.add(config, 'speed');
+    gui.add(config, 'showTrails')
+      .onChange((value: boolean) => {
+        if (value === false) {
+          this.universeTrails.forEach((ut) => ut.popAllTrails());
+        }
+        config.showTrails = value;
+      });
+    const showUniverseFolder = gui.addFolder('Show Universe');
+    showUniverseFolder.open(false);
+    this.simulation.universes.forEach((u, i) => {
+      showUniverseFolder
+        .add(config.showUniverse, u.label)
+        .onChange((value: boolean) => {
+          if (value === false) {
+            this.universeTrails[i].popAllTrails();
+          }
+          config.showUniverse[u.label] = value;
+        });
+    });
+  }
+
+  /**
+   * Simulate and play the visualization.
+   * @param divId div id to render the visualization in.
+   * @param width width of the visualization.
+   * @param height height of the visualization.
+   * @param recordFor number of seconds to record for..
+   */
+  start(divId: string, width: number, height: number, recordFor: number): void {
+    if (this.divId !== '') {
+      // throw new Error(
+      //   'Simulation already playing. Stop the current playtime before initiating a new one.',
+      // );
+      console.error('Simulation already playing. Stop the current playtime before initiating a new one.');
+      return;
+    }
     this.divId = divId;
-    this.playing = true;
     let element = document.getElementById(divId);
     if (element === null) {
       return;
     }
-
-    const steps: Partial<SliderStep>[] = this.speeds.map(
-      (speed: number): Partial<SliderStep> => ({
-        label: speed.toString(),
-        method: 'skip',
-      }),
-    );
-    const init_data: Data[] = this.simulation.universes.map(
-      (uni: Universe): Data => ({
-        x: uni.currState.bodies.map((body) => body.position.x),
-        y: uni.currState.bodies.map((body) => body.position.y),
-        z: uni.currState.bodies.map((body) => body.position.z),
-        type: this.type as PlotType,
-        mode: 'markers',
-        marker: {
-          color: uni.color,
-          sizemin: 6,
-          size: uni.currState.bodies.map((body) => Math.min(10, body.mass)),
-        },
-      }),
-    );
-
-    const width = element.clientWidth;
-    const height = element.clientHeight;
+    // const width = element.clientWidth;
+    // const height = element.clientHeight;
     let maxWidth = 0;
     let maxHeight = 0;
     this.simulation.universes.forEach((u) => u.currState.bodies.forEach((b) => {
@@ -626,6 +776,19 @@ export class RecordingVisualizer implements Visualizer {
       maxHeight = Math.max(maxHeight, Math.abs(b.position.y));
     }));
     const scale = 0.5 * Math.min(height / maxHeight, width / maxWidth);
+
+    const recordedFrames: State[][] = [];
+    const totalFrames = this.simulation.maxFrameRate * recordFor;
+    let playInd = 1;
+    this.simulation.universes.forEach((u) => {
+      recordedFrames.push([u.currState.clone()]);
+    });
+    for (let i = 0; i < totalFrames; i++) {
+      this.simulation.simulateStep(1 / this.simulation.maxFrameRate);
+      this.simulation.universes.forEach((u, j) => {
+        recordedFrames[j].push(u.currState.clone());
+      });
+    }
 
     const layout: Partial<Layout> = {
       paper_bgcolor: '#000000',
@@ -641,176 +804,230 @@ export class RecordingVisualizer implements Visualizer {
         autorange: false,
         range: [-(height / 2) / scale, height / 2 / scale],
       },
-      uirevision: 'true',
-      sliders: [
-        {
-          steps,
-          active: 0,
-        },
-      ],
+      // uirevision: 'true',
+      showlegend: false,
     };
 
-    Plotly.newPlot(divId, init_data, layout);
+    if (this.simulation.controller === 'default') {
+      this.addControls(element);
+    }
 
-    const framesPerSecond = 30;
-    const timePerFrameMs = 1000 / framesPerSecond;
-    if (animationId != null) return;
-    let lastPaintTimestampMs = 0;
-    let speed = timeScale;
+    let stats: Stats | undefined;
+    if (this.simulation.showDebugInfo) {
+      stats = new Stats();
+      stats.dom.style.position = 'absolute';
+      stats.dom.style.bottom = '0px';
+      stats.dom.style.removeProperty('top');
+      element.appendChild(stats.dom);
+    }
 
-    let count = 0;
+    const init_data: Data[] = this.simulation.universes.flatMap(
+      (uni: Universe): Data[] => {
+        const currTrail = new PlotlyUniverseTrail(
+          this.simulation.getMaxTrailLength(),
+          typeof uni.color === 'string' ? uni.color : uni.color[0],
+        );
+        this.universeTrails.push(currTrail);
+        const currData: Data = {
+          x: uni.currState.bodies.map((body) => body.position.x),
+          y: uni.currState.bodies.map((body) => body.position.y),
+          type: 'scatter',
+          mode: 'markers',
+          marker: {
+            color: uni.color,
+            sizemin: 6,
+            size: uni.currState.bodies.map((body) => Math.min(10, body.mass)),
+          },
+        };
+        if (this.simulation.getShowTrails()) {
+          uni.currState.bodies.forEach((b) => {
+            currTrail.addTrail(b.position.x, b.position.y);
+          });
+          return [currData, currTrail.data];
+        }
+        return [
+          currData,
+          {
+            x: [],
+            y: [],
+          },
+        ];
+      },
+    );
+
+    Plotly.newPlot(divId, init_data, layout, {
+      scrollZoom: true,
+      modeBarButtonsToRemove: [
+        'zoom2d',
+        'lasso2d',
+        'select2d',
+        'toImage',
+        'resetScale2d',
+      ],
+    });
+
+    if (animationId !== null) return;
+
     /**
-     * Paint the visualization.
-     * @param timestampMs current timestamp in milliseconds, provided by requestAnimationFrame.
+     * Paint the visualization
+     * @param timestampMs current timestamp in milliseconds, provided by requestAnimationFrame
      */
     const paint = (timestampMs: number) => {
-      speed
-        = this.speeds[
-          parseInt(
-            // @ts-ignore
-            document.getElementById(divId)?.layout?.sliders[0].active,
-          )
-        ];
-
       if (
-        speed === 0
-        || !this.playing
-        // || timestampMs - lastPaintTimestampMs < timePerFrameMs
+        this.simulation.controls.speed === 0
+        || this.simulation.controls.paused
       ) {
         animationId = requestAnimationFrame(paint);
         return;
       }
-      lastPaintTimestampMs = timestampMs;
-      step();
 
-      const new_data = this.simulation.universes.map((uni: Universe) => ({
-        x: uni.currState.bodies.map((body) => body.position.x),
-        y: uni.currState.bodies.map((body) => body.position.y),
-        z: uni.currState.bodies.map((body) => body.position.z),
-        hovertext: uni.currState.bodies.map((body) => body.label),
-        color: uni.color,
-        marker: {
-          size: uni.currState.bodies.map((body) => Math.min(10, body.mass)),
-        },
-      }));
+      const currPlayInd = Math.round(playInd);
+      const new_data = this.simulation.universes.flatMap(
+        (uni: Universe, i: number): Data[] => {
+          if (!this.simulation.getShowUniverse(uni.label)) {
+            return [
+              {
+                x: [],
+                y: [],
+              },
+              {},
+            ];
+          }
+          const currState = recordedFrames[i][currPlayInd];
+          const currData: Data = {
+            x: currState.bodies.map((body) => body.position.x),
+            y: currState.bodies.map((body) => body.position.y),
+            hovertext: currState.bodies.map((body) => body.label),
+            marker: {
+              size: currState.bodies.map((body) => Math.min(10, body.mass)),
+              color: uni.color,
+              sizemin: 6,
+            },
+            mode: 'markers',
+          };
 
-      // @ts-ignore
-      Plotly.animate(
-        divId,
-        {
-          data: new_data,
-        },
-        {
-          transition: {
-            duration: 0,
-          },
-          frame: {
-            duration: 0,
-            redraw: false,
-          },
+          let trailData: Data = {};
+          if (this.simulation.getShowTrails()) {
+            const currTrail = this.universeTrails[i];
+            currState.bodies.forEach((b): void => {
+              currTrail.addTrail(b.position.x, b.position.y);
+            });
+            trailData = currTrail.data;
+          }
+          return [currData, trailData];
         },
       );
+      Plotly.react(divId, new_data, layout);
 
+      if (this.simulation.showDebugInfo && stats) {
+        stats.update();
+      }
+
+      playInd = Math.round(playInd + this.simulation.controls.speed);
+      if (playInd < 0) {
+        if (this.simulation.looped) {
+          playInd = ((playInd % totalFrames) + totalFrames) % totalFrames;
+        } else {
+          playInd = 0;
+        }
+      } else if (playInd >= totalFrames) {
+        if (this.simulation.looped) {
+          playInd %= totalFrames;
+        } else {
+          playInd = totalFrames - 1;
+        }
+      }
       animationId = requestAnimationFrame(paint);
     };
 
-    // let lastSimTimestampsMs = performance.now();
-
-    // let isTabActive;
-    // window.onfocus = function () {
-    //   isTabActive = true;
-    // };
-    // window.onblur = function () {
-    //   isTabActive = false;
-    // };
-
-    // let stepIntervalID: number = -1;
-
-    /**
-     * Simulate a step in the simulation.
-     */
-    const step = () => {
-      // if (!this.playing) {
-      //   clearInterval(stepIntervalID);
-      //   return;
-      // }
-
-      // const currSimTimestampMs = performance.now();
-      if (speed !== 0) {
-        // lastSimTimestampsMs = currSimTimestampMs;
-
-        // const duration = currSimTimestampMs - lastSimTimestampsMs;
-        this.simulation.simulateStep(0.016 * speed);
-        // lastSimTimestampsMs = currSimTimestampMs;
-        // console.log(`stepping ${Math.floor(performance.now() / 1000)}`);
-      }
-    };
-
-    requestAnimationFrame(paint);
-    // stepIntervalID = window.setInterval(step, 10);
+    animationId = requestAnimationFrame(paint);
   }
 
   /**
-   * Pause the visualization.
-   */
-  pause(): void {
-    this.playing = false;
-  }
-
-  /**
-   * Resume the visualization.
-   */
-  resume(): void {
-    this.playing = true;
-  }
-
-  /**
-   * Stop the visualization.
+   * Stop the simulation and visualization.
    */
   stop(): void {
-    this.playing = false;
     Plotly.purge(this.divId);
     this.divId = '';
+    this.universeTrails = [];
   }
 }
+
 /**
  * 3D recording visualizer using Three.js.
  */
 export class RecordingVisualizer3D implements Visualizer {
   simulation: Simulation;
-  divId: string = '';
-  readonly speeds = [0, 0.5, 1, 2, 4, 10, 100, 1000, 10000];
-  playing: boolean = false;
-  universeTracers: UniverseTracer[] = [];
-  maxTraceLength = 200;
-  recordFor: number;
-  recordedFrames: State[] = [];
-  playInd: number = 0;
+  scene?: THREE.Scene;
+  universeTrailers: ThreeUniverseTrail[] = [];
 
   /**
-   * Constructor for RecordingVisualizer3D.
+   * Constructor for RealTimeVisualizer3D.
    * @param simulation simulation object.
-   * @param recordFor duration to record for.
    */
-  constructor(simulation: Simulation, recordFor: number) {
+  constructor(simulation: Simulation) {
     this.simulation = simulation;
-    this.recordFor = recordFor;
   }
 
   /**
-   * Simulate, record and play the visualization on loop.
-   * @param divId div id to render the visualization in.
-   * @param timeScale initial time scale.
+   * Adds default controls to the visualization.
+   * @param parentElement parent element to place the controller div in.
    */
-  play(divId: string, timeScale: number) {
-    this.divId = divId;
-    this.playing = true;
+  private addControls(parentElement: HTMLElement) {
+    const gui = new GUI({
+      container: parentElement,
+    });
+    gui.domElement.style.position = 'absolute';
+    gui.domElement.style.top = '0';
+    gui.domElement.style.left = '0';
+    gui.domElement.style.zIndex = '1000';
+
+    const config = this.simulation.controls;
+    gui.add(config, 'speed');
+    gui.add(config, 'showTrails')
+      .onChange((value: boolean) => {
+        if (value === false) {
+          this.universeTrailers.forEach((ut) => {
+            ut.popAllTrails();
+          });
+        }
+        config.showTrails = value;
+      });
+    const showUniverseFolder = gui.addFolder('Show Universe');
+    showUniverseFolder.open(false);
+    this.simulation.universes.forEach((u, i) => {
+      showUniverseFolder
+        .add(config.showUniverse, u.label)
+        .onChange((value: boolean) => {
+          if (value === false) {
+            this.universeTrailers[i].popAllTrails();
+          }
+          config.showUniverse[u.label] = value;
+        });
+    });
+  }
+
+  /**
+   * Simulate and play the visualization
+   * @param divId div id to render the visualization in.
+   * @param width width of the visualization.
+   * @param height height of the visualization.
+   * @param recordFor number of seconds to record for.
+   */
+  start(divId: string, width: number, height: number, recordFor: number): void {
+    if (this.scene !== undefined) {
+      // throw new Error(
+      //   'Simulation already playing. Stop the current playtime before initiating a new one.',
+      // );
+      console.error('Simulation already playing. Stop the current playtime before initiating a new one.');
+      return;
+    }
     let element = document.getElementById(divId);
     if (element === null) {
       return;
     }
-    const width = element.clientWidth;
-    const height = element.clientHeight;
+    // const width = element.clientWidth;
+    // const height = element.clientHeight;
     let maxWidth = 0;
     let maxHeight = 0;
     this.simulation.universes.forEach((u) => u.currState.bodies.forEach((b) => {
@@ -818,14 +1035,9 @@ export class RecordingVisualizer3D implements Visualizer {
       maxHeight = Math.max(maxHeight, Math.abs(b.position.y));
     }));
     const scale = 0.5 * Math.min(height / maxHeight, width / maxWidth);
-    const framesPerSecond = 60;
 
-    for (let i = 0; i < framesPerSecond * this.recordFor; i++) {
-      this.recordedFrames.push(this.simulation.universes[0].currState.clone());
-      this.simulation.simulateStep(1 / framesPerSecond);
-    }
+    this.scene = new THREE.Scene();
 
-    const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(
       width / -2,
       width / 2,
@@ -837,28 +1049,62 @@ export class RecordingVisualizer3D implements Visualizer {
     camera.position.set(0, 0, Math.max(width, height));
 
     const renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(width, height);
     renderer.autoClear = false;
     element.appendChild(renderer.domElement);
-    const stats = new Stats();
-    element.parentNode?.appendChild(stats.dom);
+
+    let stats: Stats | undefined;
+    if (this.simulation.showDebugInfo) {
+      stats = new Stats();
+      stats.dom.style.position = 'absolute';
+      stats.dom.style.right = '0px';
+      stats.dom.style.removeProperty('left');
+      element.appendChild(stats.dom);
+    }
+
+    if (this.simulation.controller === 'default') {
+      this.addControls(element);
+    }
+
+    // const earthDiv = document.createElement('div');
+    // earthDiv.className = 'label';
+    // earthDiv.textContent = 'Earthhgkjfdghkjfgh';
+    // earthDiv.style.backgroundColor = 'transparent';
+    // earthDiv.style.color = 'white';
+    // earthDiv.style.fontFamily = 'sans-serif';
+    // earthDiv.style.background = 'rgba(0, 0, 0, 0.6)';
+
+    // const earthLabel = new CSS2DObject(earthDiv);
+    // earthLabel.position.set(0, 0, 0);
+    // earthLabel.center.set(0, 1);
+    // // arr[0].add(earthLabel);
+    // earthLabel.layers.set(0);
+    // const labelRenderer = new CSS2DRenderer();
+    // labelRenderer.setSize(width, height);
+    // labelRenderer.domElement.style.position = 'absolute';
+    // labelRenderer.domElement.style.top = '0px';
+    // element.appendChild(labelRenderer.domElement);
 
     const orbitControls = new OrbitControls(camera, renderer.domElement);
     orbitControls.listenToKeyEvents(window);
     orbitControls.update();
 
     const axesHelper = new THREE.AxesHelper(width);
-    scene.add(axesHelper);
+    this.scene.add(axesHelper);
     const viewHelper = new ViewHelper(camera, renderer.domElement);
 
     // var m: Map<string, THREE.LineSegments> = new Map();
     let arr: THREE.LineSegments[] = [];
 
-    this.simulation.universes.forEach((u, i) => {
-      if (i > 0) {
-        return;
-      }
-      this.universeTracers.push(new UniverseTracer(this.maxTraceLength));
+    this.simulation.universes.forEach((u) => {
+      this.universeTrailers.push(
+        new ThreeUniverseTrail(
+          this.simulation.maxTrailLength,
+          typeof u.color === 'string' ? u.color : u.color[0],
+          this.scene!,
+          scale,
+        ),
+      );
       u.currState.bodies.forEach((b) => {
         const sph = new THREE.SphereGeometry(
           clipMinMax(Math.log2(b.mass) - 70, 10, 40),
@@ -873,92 +1119,89 @@ export class RecordingVisualizer3D implements Visualizer {
             color: new THREE.Color(u.color),
           }),
         );
-        scene.add(line);
+        this.scene!.add(line);
         line.position.copy(b.position.clone()
           .multiplyScalar(scale));
+        // m.set(u.label + " " + b.label, line);
         arr.push(line);
       });
     });
+    // arr[0].add(earthLabel)
 
-    const gui = new GUI();
-    let config: {
-      'Time Scale': number;
-    //   showTracers: boolean;
-    //   showUniverse: { [key: string]: boolean };
-    } = {
-      'Time Scale': timeScale,
-    //   showTracers: true,
-    //   showUniverse: {},
-    };
-
-    gui.add(config, 'Time Scale');
-    // gui.add(config, "showTracers").onChange((value: boolean) => {
-    //   if (value === false) {
-    //     this.universeTracers.forEach((ut) => {
-    //       ut.popAllTraces(scene);
-    //     });
-    //   }
-    //   config.showTracers = value;
-    // });
-    // const showUniverseFolder = gui.addFolder("Show Universe");
-    // showUniverseFolder.open(false);
-    // this.simulation.universes.forEach((u, i) => {
-    //   config.showUniverse[u.label] = true;
-    //   showUniverseFolder
-    //     .add(config.showUniverse, u.label)
-    //     .onChange((value: boolean) => {
-    //       if (value === false) {
-    //         this.universeTracers[i].popAllTraces(scene);
-    //       }
-    //       config.showUniverse[u.label] = value;
-    //     });
-    // });
-
-    // const step = () => {
-    //   var currTimestampMs = performance.now();
-    //   this.simulation.simulateStep(
-    //     (config["Time Scale"] *
-    //       Math.min(currTimestampMs - lastSimTimestampMs, 10)) /
-    //       1000
-    //   );
-    //   lastSimTimestampMs = currTimestampMs;
-    // };
-
-    // var lastPaint = performance.now();
+    const recordedFrames: State[][] = [];
+    const totalFrames = this.simulation.maxFrameRate * recordFor;
+    let playInd = 1;
+    this.simulation.universes.forEach((u) => {
+      recordedFrames.push([u.currState.clone()]);
+    });
+    for (let i = 0; i < totalFrames; i++) {
+      this.simulation.simulateStep(1 / this.simulation.maxFrameRate);
+      this.simulation.universes.forEach((u, j) => {
+        recordedFrames[j].push(u.currState.clone());
+      });
+    }
 
     /**
-     * Paint the visualization.
-     * @param timestampMs current timestamp in milliseconds, provided by requestAnimationFrame.
+     * Paint the visualization
+     * @param timestampMs current timestamp in milliseconds, provided by requestAnimationFrame
      */
     const paint = (timestampMs: number) => {
-      // if (config["Time Scale"] === 0 || !this.playing) {
-      //   requestAnimationFrame(paint);
-      //   return;
-      // }
-      // step();
-
-      // if (timestampMs - lastPaint < 1000 / fps) {
-      //   requestAnimationFrame(paint);
-      //   return;
-      // }
-      // lastPaint = timestampMs;
-      stats.update();
+      if (
+        this.simulation.controls.speed === 0
+        || this.simulation.controls.paused
+      ) {
+        requestAnimationFrame(paint);
+        renderer.clear();
+        renderer.render(this.scene!, camera);
+        viewHelper.render(renderer);
+        // labelRenderer.render(scene, camera);
+        orbitControls.update();
+        return;
+      }
 
       let ind = 0;
-      if (this.recordedFrames[this.playInd] === undefined) {
-        throw new Error('undefined frame');
-      }
-      this.recordedFrames[this.playInd].bodies.forEach((b) => {
-        arr[ind].visible = true;
-        arr[ind].position.copy(b.position.clone()
-          .multiplyScalar(scale));
-        ind++;
+      this.simulation.universes.forEach((u, i) => {
+        if (this.simulation.controls.showUniverse[u.label]) {
+          const currState = recordedFrames[i][playInd];
+          currState.bodies.forEach((b) => {
+            arr[ind].visible = true;
+            arr[ind].position.copy(b.position.clone()
+              .multiplyScalar(scale));
+            if (this.simulation.controls.showTrails) {
+              this.universeTrailers[i].addTrail(arr[ind].position);
+            }
+            ind++;
+          });
+        } else {
+          u.currState.bodies.forEach(() => {
+            arr[ind].visible = false;
+            ind++;
+          });
+        }
       });
-      this.playInd = (this.playInd + Math.floor(config['Time Scale']) + this.recordedFrames.length) % this.recordedFrames.length;
+
+      if (this.simulation.showDebugInfo && stats) {
+        stats.update();
+      }
+
+      playInd = Math.round(playInd + this.simulation.controls.speed);
+      if (playInd < 0) {
+        if (this.simulation.looped) {
+          playInd = ((playInd % totalFrames) + totalFrames) % totalFrames;
+        } else {
+          playInd = 0;
+        }
+      } else if (playInd >= totalFrames) {
+        if (this.simulation.looped) {
+          playInd %= totalFrames;
+        } else {
+          playInd = totalFrames - 1;
+        }
+      }
 
       requestAnimationFrame(paint);
       renderer.clear();
-      renderer.render(scene, camera);
+      renderer.render(this.scene!, camera);
       viewHelper.render(renderer);
       // labelRenderer.render(scene, camera);
       orbitControls.update();
@@ -968,24 +1211,14 @@ export class RecordingVisualizer3D implements Visualizer {
   }
 
   /**
-   * Pause the visualization.
-   */
-  pause(): void {
-    this.playing = false;
-  }
-
-  /**
-   * Resume the visualization.
-   */
-  resume(): void {
-    this.playing = true;
-  }
-
-  /**
-   * Stop the visualization.
+   * Stop the simulation and visualization.
    */
   stop(): void {
-    this.playing = false;
-    this.divId = '';
+    this.scene?.clear();
+    this.scene = undefined;
+    this.universeTrailers.forEach((ut) => {
+      ut.popAllTrails();
+    });
+    this.universeTrailers = [];
   }
 }
