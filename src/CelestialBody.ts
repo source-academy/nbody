@@ -2,13 +2,29 @@ import { type Vector3 } from 'three';
 
 /**
  * Represents a celestial body with all of its kinematic properties.
+ * @category Building blocks
  */
 export class CelestialBody {
+  /**
+   * Label of the body.
+   */
   readonly label: string;
+  /**
+   * Mean mass of the body.
+   */
   readonly mass: number; // mean mass
-  position: Vector3; // ICRF
-  velocity: Vector3; // ICRF
-  acceleration: Vector3; // ICRF
+  /**
+   * Position vector of the body.
+   */
+  position: Vector3;
+  /**
+   * Velocity vector of the body.
+   */
+  velocity: Vector3;
+  /**
+   * Acceleration vector of the body.
+   */
+  acceleration: Vector3;
 
   /**
    * Create a new CelestialBody with the provided information.

@@ -1,6 +1,7 @@
 import type { CelestialBody } from './CelestialBody';
 /**
  * Represents a Universe's state snapshot.
+ * @category Building blocks
  */
 export declare class State {
     /**

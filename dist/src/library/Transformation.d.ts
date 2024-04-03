@@ -3,6 +3,7 @@ import { type State } from '../State';
 import { type Transformation } from '../Transformation';
 /**
  * Frame of reference transformation to the center of the first body in the system.
+ * @category Transformations
  */
 export declare class BodyCenterTransformation implements Transformation {
     /**
@@ -14,6 +15,7 @@ export declare class BodyCenterTransformation implements Transformation {
 }
 /**
  * Frame of reference transformation to the center of mass of the system.
+ * @category Transformations
  */
 export declare class CoMTransformation implements Transformation {
     /**
@@ -25,6 +27,7 @@ export declare class CoMTransformation implements Transformation {
 }
 /**
  * Frame of reference transformation around an axis by an angle. Makes sense to this transformation only during initialization of the universe and not at every time step.
+ * @category Transformations
  */
 export declare class RotateTransformation implements Transformation {
     readonly axis: Vector3;

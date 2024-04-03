@@ -1,12 +1,14 @@
-import { Vector3 } from 'three';
-import { type CelestialBody } from '../CelestialBody';
 import { type Force } from '../Force';
 import { type SimulateFunction } from '../SimulateFunction';
 import { State } from '../State';
 /**
  * Represents a simulation function object that uses the [Velocity Verlet integration method](https://en.wikipedia.org/wiki/Verlet_integration#Velocity_Verlet) to simulate the motion of bodies.
+ * @category SimulateFunctions
  */
 export declare class VelocityVerletSim implements SimulateFunction {
+    /**
+     * Force object to calculate forces on bodies in the Universe.
+     */
     forceCalculator: Force;
     /**
      * Create a new VelocityVerletSim with the provided force calculator, which is invoked on every simulation step.
@@ -29,13 +31,18 @@ export declare class VelocityVerletSim implements SimulateFunction {
      * @param currAccel current acceleration.
      * @param deltaT time step.
      * @returns new position.
+     * @hidden
      */
-    calcNewPos(currPos: Vector3, currVel: Vector3, currAccel: Vector3, deltaT: number): Vector3;
+    private calcNewPos;
 }
 /**
  * Represents a simulation function object that uses the [Euler integration method](https://en.wikipedia.org/wiki/Euler_method) to simulate motions of bodies.
+ * @category SimulateFunctions
  */
 export declare class ExplicitEulerSim implements SimulateFunction {
+    /**
+     * Force object to calculate forces on bodies in the Universe.
+     */
     force: Force;
     /**
      * Create a new ExplicitEulerSim with the provided force calculator, which is invoked on every simulation step.
@@ -55,13 +62,18 @@ export declare class ExplicitEulerSim implements SimulateFunction {
      * @param rate rate of change.
      * @param deltaT time step.
      * @returns updated value.
+     * @hidden
      */
     private rateUpdate;
 }
 /**
  * Represents a simulation function object that uses the [Semi-Implicit Euler integration method](https://en.wikipedia.org/wiki/Semi-implicit_Euler_method) to simulate the motion of bodies.
+ * @category SimulateFunctions
  */
 export declare class SemiImplicitEulerSim implements SimulateFunction {
+    /**
+     * Force object to calculate forces on bodies in the Universe.
+     */
     force: Force;
     /**
      * Create a new SemiImplicitEulerSim with the provided force calculator, which is invoked on every simulation step.
@@ -81,27 +93,22 @@ export declare class SemiImplicitEulerSim implements SimulateFunction {
      * @param rate rate of change.
      * @param deltaT time step.
      * @returns updated value.
+     * @hidden
      */
     private rateUpdate;
 }
 /**
- * Container for intermediate kinematic rate values in the Runge-Kutta 4 integration method.
- */
-type RungeKuttaSteps = {
-    /**
-     * Intermediate velocity rate values.
-     */
-    kv: Vector3[];
-    /**
-     * Intermediate position rate values.
-     */
-    kx: Vector3[];
-};
-/**
  * Represents a simulation function object that uses the [Runge-Kutta 4 integration method](https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods) to simulate the motion of bodies.
+ * @category SimulateFunctions
  */
 export declare class RungeKutta4Sim implements SimulateFunction {
+    /**
+     * Force object to calculate forces on bodies in the Universe.
+     */
     force: Force;
+    /**
+     * Weights for weighted average.
+     */
     weights: number[];
     /**
      * Create a new RungeKutta4Sim with the provided weights for average force calculator, which is invoked on every simulation step.
@@ -123,8 +130,9 @@ export declare class RungeKutta4Sim implements SimulateFunction {
      * @param krInd index of intermediate kinematic rate value to base the new intermediate value on.
      * @param deltaT time step.
      * @returns next intermediate velocity rate values for all bodies.
+     * @hidden
      */
-    getInterKV(bodies: CelestialBody[], bodiesK: RungeKuttaSteps[], krInd: number, deltaT: number): Vector3[];
+    private getInterKV;
     /**
      * Get intermediate position rate values.
      * @param bodies current bodies.
@@ -132,7 +140,7 @@ export declare class RungeKutta4Sim implements SimulateFunction {
      * @param kInd index of intermediate kinematic rate value to base the new intermediate value on.
      * @param deltaT time step.
      * @returns next intermediate position rate values for all bodies.
+     * @hidden
      */
-    getInterKX(bodies: CelestialBody[], bodiesK: RungeKuttaSteps[], kInd: number, deltaT: number): Vector3[];
+    private getInterKX;
 }
-export {};

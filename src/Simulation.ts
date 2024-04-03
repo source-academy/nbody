@@ -9,25 +9,76 @@ import {
   RecordingVisualizer3D,
 } from './library/Visualizer';
 
+/**
+ * Visualization type.
+ * @category Types
+ */
 export type VisType = '2D' | '3D';
-export type ControllerType = 'default' | 'manual' | 'none';
+/**
+ * Controller type.
+ * - 'ui' for user interface control.
+ * - 'code' for manual control via code.
+ * - 'none' for no control.
+ * @category Types
+ */
+export type ControllerType = 'ui' | 'code' | 'none';
+
 /**
  * A Simulation object that contains Universes and a Visualizer.
+ * @category Building blocks
  */
 export class Simulation {
+  /**
+   * Visualization object used to render the simulation.
+   * @hidden
+   */
   readonly visualizer: Visualizer;
   /**
    * Array of Universes that make up this simulation. All universes are simulated independently and visualized together.
+   * @hidden
    */
   readonly universes: Universe[];
+  /**
+   * Controller type used to control the simulation.
+   * @hidden
+   */
   readonly controller: ControllerType;
+  /**
+   * Maximum frame rate of the visualization.
+   * @hidden
+   */
   maxFrameRate: number;
+  /**
+   * Maximum trail length used in the visualization.
+   * @hidden
+   */
   maxTrailLength: number;
+  /**
+   * Whether the simulation is looped in case of a recording.
+   * @hidden
+   */
   looped: boolean;
+
+  /**
+   * Controls object used to control the simulation.
+   * @hidden
+   */
   controls: {
+    /**
+     * Speed of the simulation as a scale of normal time.
+     */
     speed: number;
+    /**
+     * True if the simulation is paused.
+     */
     paused: boolean;
+    /**
+     * True if trails are shown in the visualization.
+     */
     showTrails: boolean;
+    /**
+     * Object containing whether each universe is shown in the visualization.
+     */
     showUniverse: {
       [key: string]: boolean;
     };
@@ -37,6 +88,10 @@ export class Simulation {
       showTrails: false,
       showUniverse: {},
     };
+  /**
+   * True if debug info is shown in the visualization.
+   * @hidden
+   */
   showDebugInfo: boolean;
 
   /**
@@ -116,11 +171,11 @@ export class Simulation {
   }
 
   /**
-   * Set the speed of the simulation. Only works if the controller is 'manual'.
+   * Set the speed of the simulation. Only works if the controller is 'code'.
    * @param speed speed of the simulation as a scale of normal time.
    */
   setSpeed(speed: number) {
-    if (this.controller === 'manual') {
+    if (this.controller === 'code') {
       this.controls.speed = speed;
     }
   }
@@ -134,19 +189,19 @@ export class Simulation {
   }
 
   /**
-   * Pause the simulation. Only works if the controller is 'manual'.
+   * Pause the simulation. Only works if the controller is 'code'.
    */
   pause(): void {
-    if (this.controller === 'manual') {
+    if (this.controller === 'code') {
       this.controls.paused = true;
     }
   }
 
   /**
-   * Resume the simulation. Only works if the controller is 'manual'.
+   * Resume the simulation. Only works if the controller is 'code'.
    */
   resume(): void {
-    if (this.controller === 'manual') {
+    if (this.controller === 'code') {
       this.controls.paused = false;
     }
   }
@@ -160,11 +215,11 @@ export class Simulation {
   }
 
   /**
-   * Set whether to show trails in the visualization. Only works if the controller is 'manual'.
+   * Set whether to show trails in the visualization. Only works if the controller is 'code'.
    * @param showTrails true to show trails.
    */
   setShowTrails(showTrails: boolean): void {
-    if (this.controller === 'manual') {
+    if (this.controller === 'code') {
       this.controls.showTrails = showTrails;
       if (!showTrails) {
         // TODO
@@ -182,12 +237,12 @@ export class Simulation {
   }
 
   /**
-   * Set whether to show the universe with the given label. Only works if the controller is 'manual'.
+   * Set whether to show the universe with the given label. Only works if the controller is 'code'.
    * @param label universe label.
    * @param show true to show the universe.
    */
   setShowUniverse(label: string, show: boolean) {
-    if (this.controller === 'manual') {
+    if (this.controller === 'code') {
       this.controls.showUniverse[label] = show;
     }
   }
@@ -205,13 +260,17 @@ export class Simulation {
    * @param maxTrailLength maximum trail length.
    */
   setMaxTrailLength(maxTrailLength: number): void {
-    this.maxTrailLength = maxTrailLength;
+    if (this.controller === 'code') {
+      this.maxTrailLength = maxTrailLength;
+    }
   }
+
   /**
    * Simulates a single step in this simulation.
    * @param deltaT time step to simulate.
+   * @hidden
    */
-  simulateStep(deltaT: number) {
+  simulateStep(deltaT: number): void {
     this.universes.forEach((universe) => {
       universe.simulateStep(deltaT);
     });
@@ -241,7 +300,7 @@ export class Simulation {
   }
 
   /**
-   * Stop the simulation.
+   * Stop and clear the simulation.
    */
   stop(): void {
     this.visualizer.stop();

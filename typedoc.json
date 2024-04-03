@@ -1,0 +1,23 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src"],
+  "out": "docs",
+  "categoryOrder": [
+    "Building blocks",
+    "Interfaces",
+    "Forces",
+    "Simulate Functions",
+    "*"
+  ],
+  "searchInComments": true,
+  "sidebarLinks": {
+    "npm": "https://www.npmjs.com/package/nbody",
+    "GitHub": "https://github.com/source-academy/nbody/"
+  },
+  "navigation": {
+    "includeCategories": true,
+    "includeGroups": false,
+    "includeFolders": true
+  },
+  "defaultCategory": "Building blocks"
+}

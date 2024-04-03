@@ -36,6 +36,7 @@ declare class PlotlyUniverseTrail {
 }
 /**
  * 2D real-time visualizer using Plotly.
+ * @category Visualizers
  */
 export declare class RealTimeVisualizer implements Visualizer {
     simulation: Simulation;
@@ -94,11 +95,12 @@ declare class ThreeUniverseTrail {
 }
 /**
  * 3D real-time visualizer using Three.js.
+ * @category Visualizers
  */
 export declare class RealTimeVisualizer3D implements Visualizer {
     simulation: Simulation;
     scene?: THREE.Scene;
-    universeTrailers: ThreeUniverseTrail[];
+    universeTrails: ThreeUniverseTrail[];
     /**
      * Constructor for RealTimeVisualizer3D.
      * @param simulation simulation object.
@@ -123,6 +125,7 @@ export declare class RealTimeVisualizer3D implements Visualizer {
 }
 /**
  * 2D recording visualizer using Plotly.
+ * @category Visualizers
  */
 export declare class RecordingVisualizer implements Visualizer {
     simulation: Simulation;
@@ -153,11 +156,12 @@ export declare class RecordingVisualizer implements Visualizer {
 }
 /**
  * 3D recording visualizer using Three.js.
+ * @category Visualizers
  */
 export declare class RecordingVisualizer3D implements Visualizer {
     simulation: Simulation;
     scene?: THREE.Scene;
-    universeTrailers: ThreeUniverseTrail[];
+    universeTrails: ThreeUniverseTrail[];
     /**
      * Constructor for RealTimeVisualizer3D.
      * @param simulation simulation object.

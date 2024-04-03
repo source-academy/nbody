@@ -1,28 +1,81 @@
 import { type Universe } from './Universe';
 import { type Visualizer } from './Visualizer';
+/**
+ * Visualization type.
+ * @category Types
+ */
 export type VisType = '2D' | '3D';
-export type ControllerType = 'default' | 'manual' | 'none';
+/**
+ * Controller type.
+ * - 'ui' for user interface control.
+ * - 'code' for manual control via code.
+ * - 'none' for no control.
+ * @category Types
+ */
+export type ControllerType = 'ui' | 'code' | 'none';
 /**
  * A Simulation object that contains Universes and a Visualizer.
+ * @category Building blocks
  */
 export declare class Simulation {
+    /**
+     * Visualization object used to render the simulation.
+     * @hidden
+     */
     readonly visualizer: Visualizer;
     /**
      * Array of Universes that make up this simulation. All universes are simulated independently and visualized together.
+     * @hidden
      */
     readonly universes: Universe[];
+    /**
+     * Controller type used to control the simulation.
+     * @hidden
+     */
     readonly controller: ControllerType;
+    /**
+     * Maximum frame rate of the visualization.
+     * @hidden
+     */
     maxFrameRate: number;
+    /**
+     * Maximum trail length used in the visualization.
+     * @hidden
+     */
     maxTrailLength: number;
+    /**
+     * Whether the simulation is looped in case of a recording.
+     * @hidden
+     */
     looped: boolean;
+    /**
+     * Controls object used to control the simulation.
+     * @hidden
+     */
     controls: {
+        /**
+         * Speed of the simulation as a scale of normal time.
+         */
         speed: number;
+        /**
+         * True if the simulation is paused.
+         */
         paused: boolean;
+        /**
+         * True if trails are shown in the visualization.
+         */
         showTrails: boolean;
+        /**
+         * Object containing whether each universe is shown in the visualization.
+         */
         showUniverse: {
             [key: string]: boolean;
         };
     };
+    /**
+     * True if debug info is shown in the visualization.
+     * @hidden
+     */
     showDebugInfo: boolean;
     /**
      * Create a new Simulation object with the provided Universes and visualization config.
@@ -52,7 +105,7 @@ export declare class Simulation {
      */
     getSpeed(): number;
     /**
-     * Set the speed of the simulation. Only works if the controller is 'manual'.
+     * Set the speed of the simulation. Only works if the controller is 'code'.
      * @param speed speed of the simulation as a scale of normal time.
      */
     setSpeed(speed: number): void;
@@ -62,11 +115,11 @@ export declare class Simulation {
      */
     isPlaying(): boolean;
     /**
-     * Pause the simulation. Only works if the controller is 'manual'.
+     * Pause the simulation. Only works if the controller is 'code'.
      */
     pause(): void;
     /**
-     * Resume the simulation. Only works if the controller is 'manual'.
+     * Resume the simulation. Only works if the controller is 'code'.
      */
     resume(): void;
     /**
@@ -75,7 +128,7 @@ export declare class Simulation {
      */
     getShowTrails(): boolean;
     /**
-     * Set whether to show trails in the visualization. Only works if the controller is 'manual'.
+     * Set whether to show trails in the visualization. Only works if the controller is 'code'.
      * @param showTrails true to show trails.
      */
     setShowTrails(showTrails: boolean): void;
@@ -86,7 +139,7 @@ export declare class Simulation {
      */
     getShowUniverse(label: string): boolean;
     /**
-     * Set whether to show the universe with the given label. Only works if the controller is 'manual'.
+     * Set whether to show the universe with the given label. Only works if the controller is 'code'.
      * @param label universe label.
      * @param show true to show the universe.
      */
@@ -104,6 +157,7 @@ export declare class Simulation {
     /**
      * Simulates a single step in this simulation.
      * @param deltaT time step to simulate.
+     * @hidden
      */
     simulateStep(deltaT: number): void;
     /**
@@ -115,7 +169,7 @@ export declare class Simulation {
      */
     start(divId: string, width: number, height: number, speed?: number, paused?: boolean, recordFor?: number): void;
     /**
-     * Stop the simulation.
+     * Stop and clear the simulation.
      */
     stop(): void;
 }

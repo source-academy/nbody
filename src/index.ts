@@ -17,7 +17,7 @@ import {
 } from './library/SimulateFunction';
 import { LambdaSim, type SimulateFunction } from './SimulateFunction';
 
-import { Simulation, type VisType } from './Simulation';
+import { Simulation, type ControllerType, type VisType } from './Simulation';
 
 import { State } from './State';
 
@@ -43,5 +43,5 @@ export {
   RecordingVisualizer,
   RecordingVisualizer3D,
   RotateTransformation, RungeKutta4Sim,
-  SemiImplicitEulerSim, Simulation, State, Universe, Vector3, VelocityVerletSim, type Force, type SimulateFunction, type Transformation, type UniverseConfig, type VisType,
+  SemiImplicitEulerSim, Simulation, State, Universe, Vector3, VelocityVerletSim, type ControllerType, type Force, type SimulateFunction, type Transformation, type UniverseConfig, type VisType,
 };
