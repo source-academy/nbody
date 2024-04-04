@@ -4,27 +4,53 @@ import { type Transformation } from './Transformation';
 
 /**
  * Container for a Universe's configuration.
+ * @category Types
  */
 export type UniverseConfig = {
+  /**
+   * Previous state of the Universe.
+   */
   prevState: State;
+  /**
+   * Current state of the Universe.
+   */
   currState: State;
+  /**
+   * Color of the bodies in the Universe. A single color applied to all bodies or an array of colors applied to each body respectively. Length of the array should match the number of bodies in the state.
+   */
   color: string | string[];
+  /**
+   * Label of the Universe.
+   */
   label: string;
+  /**
+   * Simulation function used to simulate the Universe.
+   */
   simFunc: SimulateFunction;
+  /**
+   * Array of transformations to be applied to the Universe's state after simulation and before visualization.
+   */
   transformations: Transformation[];
 };
 
 /**
  * A Universe object that contains previous and current state of the universe, a simulation function, frame of reference transformations and other necessary data.
+ * @category Building blocks
  */
 export class Universe {
   prevState: State;
   currState: State;
   /**
-   * Color of the bodies in the Universe. A single color applied to all bodies or an array of colors applied to each body respectively.
+   * Color of the bodies in the Universe. A single color applied to all bodies or an array of colors applied to each body respectively. Incase of array, length should match the number of bodies in the state.
    */
   color: string | string[];
+  /**
+   * Label of the Universe.
+   */
   label: string;
+  /**
+   * Simulation function used to simulate the Universe.
+   */
   simFunc: SimulateFunction;
   /**
    * Array of transformations to be applied to the Universe's state after simulation and before visualization.
@@ -56,6 +82,7 @@ export class Universe {
   /**
    * Simulate a step in the Universe using the SimulateFunction and Transformations.
    * @param deltaT time step to simulate.
+   * @hidden
    */
   simulateStep(deltaT: number) {
     let newState = this.simFunc.simulate(
@@ -76,8 +103,8 @@ export class Universe {
    */
   clone(): Universe {
     return new Universe({
-      prevState: this.prevState,
-      currState: this.currState,
+      prevState: this.prevState.clone(),
+      currState: this.currState.clone(),
       color: this.color,
       label: this.label,
       simFunc: this.simFunc,

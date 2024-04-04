@@ -1,6 +1,6 @@
 {
   "name": "nbody",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Configure, simulate and visualize n-body interactions",
   "main": "./dist/index.js",
   "types": "./dist/src/index.d.ts",
@@ -13,14 +13,24 @@
     "README.md",
     "LICENSE"
   ],
+  "keywords": [
+    "nbody",
+    "simulation",
+    "visualization",
+    "physics",
+    "gravity",
+    "space",
+    "three",
+    "plotly",
+    "3-body"
+  ],
   "scripts": {
     "lint": "eslint --config src/.eslintrc.cjs --quiet .",
-    "docs": "typedoc --out docs src",
+    "docs": "typedoc",
     "clean": "node scripts/clean.cjs",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "yarn lint && yarn clean && webpack && yarn docs",
-    "testBuild": "yarn clean && webpack",
-    "dev": "yarn build && yarn unlink && yarn link"
+    "dev": "yarn clean && webpack && yarn unlink && yarn link"
   },
   "dependencies": {
     "lil-gui": "^0.19.2"

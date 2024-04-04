@@ -137,6 +137,12 @@ module.exports = {
         },
       },
     ],
+    "jsdoc/check-tag-names": [
+      "warn",
+      {
+        definedTags: ["param", "returns", "category", "defaultValue", "hidden"],
+      },
+    ],
   },
   overrides: [
     {

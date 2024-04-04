@@ -1,17 +1,23 @@
 # nbody
 
-N-body simulations as a Source Academy module
+N-body simulations as a Source Academy module.
 
 ## Installation
 
-TODO
+The package is published and available on the npm registry as [nbody](https://www.npmjs.com/package/nbody).
+
+```bash
+npm install nbody three @types/three plotly.js-dist @types/plotly.js
+```
+
+or
+
+```bash
+yarn add nbody three @types/three plotly.js-dist @types/plotly.js
+```
 
 ## Usage
 
-TODO
+Full API Documentation available [here](https://source-academy.github.io/nbody/).
 
 ## For developers
-
-TODO
-
-npm install three@0.158.0 @types/three@0.158.0

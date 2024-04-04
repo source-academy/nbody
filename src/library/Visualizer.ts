@@ -90,6 +90,7 @@ class PlotlyUniverseTrail {
 
 /**
  * 2D real-time visualizer using Plotly.
+ * @category Visualizers
  */
 export class RealTimeVisualizer implements Visualizer {
   simulation: Simulation;
@@ -187,7 +188,7 @@ export class RealTimeVisualizer implements Visualizer {
       showlegend: false,
     };
 
-    if (this.simulation.controller === 'default') {
+    if (this.simulation.controller === 'ui') {
       this.addControls(element);
     }
 
@@ -428,11 +429,12 @@ class ThreeUniverseTrail {
 
 /**
  * 3D real-time visualizer using Three.js.
+ * @category Visualizers
  */
 export class RealTimeVisualizer3D implements Visualizer {
   simulation: Simulation;
   scene?: THREE.Scene;
-  universeTrailers: ThreeUniverseTrail[] = [];
+  universeTrails: ThreeUniverseTrail[] = [];
 
   /**
    * Constructor for RealTimeVisualizer3D.
@@ -460,7 +462,7 @@ export class RealTimeVisualizer3D implements Visualizer {
     gui.add(config, 'showTrails')
       .onChange((value: boolean) => {
         if (value === false) {
-          this.universeTrailers.forEach((ut) => {
+          this.universeTrails.forEach((ut) => {
             ut.popAllTrails();
           });
         }
@@ -473,7 +475,7 @@ export class RealTimeVisualizer3D implements Visualizer {
         .add(config.showUniverse, u.label)
         .onChange((value: boolean) => {
           if (value === false) {
-            this.universeTrailers[i].popAllTrails();
+            this.universeTrails[i].popAllTrails();
           }
           config.showUniverse[u.label] = value;
         });
@@ -535,7 +537,7 @@ export class RealTimeVisualizer3D implements Visualizer {
       element.appendChild(stats.dom);
     }
 
-    if (this.simulation.controller === 'default') {
+    if (this.simulation.controller === 'ui') {
       this.addControls(element);
     }
 
@@ -570,7 +572,7 @@ export class RealTimeVisualizer3D implements Visualizer {
     let arr: THREE.LineSegments[] = [];
 
     this.simulation.universes.forEach((u) => {
-      this.universeTrailers.push(
+      this.universeTrails.push(
         new ThreeUniverseTrail(
           this.simulation.maxTrailLength,
           typeof u.color === 'string' ? u.color : u.color[0],
@@ -660,7 +662,7 @@ export class RealTimeVisualizer3D implements Visualizer {
             arr[ind].position.copy(b.position.clone()
               .multiplyScalar(scale));
             if (this.simulation.controls.showTrails) {
-              this.universeTrailers[i].addTrail(arr[ind].position);
+              this.universeTrails[i].addTrail(arr[ind].position);
             }
             ind++;
           });
@@ -688,15 +690,16 @@ export class RealTimeVisualizer3D implements Visualizer {
   stop(): void {
     this.scene?.clear();
     this.scene = undefined;
-    this.universeTrailers.forEach((ut) => {
+    this.universeTrails.forEach((ut) => {
       ut.popAllTrails();
     });
-    this.universeTrailers = [];
+    this.universeTrails = [];
   }
 }
 
 /**
  * 2D recording visualizer using Plotly.
+ * @category Visualizers
  */
 export class RecordingVisualizer implements Visualizer {
   simulation: Simulation;
@@ -808,7 +811,7 @@ export class RecordingVisualizer implements Visualizer {
       showlegend: false,
     };
 
-    if (this.simulation.controller === 'default') {
+    if (this.simulation.controller === 'ui') {
       this.addControls(element);
     }
 
@@ -955,11 +958,12 @@ export class RecordingVisualizer implements Visualizer {
 
 /**
  * 3D recording visualizer using Three.js.
+ * @category Visualizers
  */
 export class RecordingVisualizer3D implements Visualizer {
   simulation: Simulation;
   scene?: THREE.Scene;
-  universeTrailers: ThreeUniverseTrail[] = [];
+  universeTrails: ThreeUniverseTrail[] = [];
 
   /**
    * Constructor for RealTimeVisualizer3D.
@@ -987,7 +991,7 @@ export class RecordingVisualizer3D implements Visualizer {
     gui.add(config, 'showTrails')
       .onChange((value: boolean) => {
         if (value === false) {
-          this.universeTrailers.forEach((ut) => {
+          this.universeTrails.forEach((ut) => {
             ut.popAllTrails();
           });
         }
@@ -1000,7 +1004,7 @@ export class RecordingVisualizer3D implements Visualizer {
         .add(config.showUniverse, u.label)
         .onChange((value: boolean) => {
           if (value === false) {
-            this.universeTrailers[i].popAllTrails();
+            this.universeTrails[i].popAllTrails();
           }
           config.showUniverse[u.label] = value;
         });
@@ -1062,7 +1066,7 @@ export class RecordingVisualizer3D implements Visualizer {
       element.appendChild(stats.dom);
     }
 
-    if (this.simulation.controller === 'default') {
+    if (this.simulation.controller === 'ui') {
       this.addControls(element);
     }
 
@@ -1097,7 +1101,7 @@ export class RecordingVisualizer3D implements Visualizer {
     let arr: THREE.LineSegments[] = [];
 
     this.simulation.universes.forEach((u) => {
-      this.universeTrailers.push(
+      this.universeTrails.push(
         new ThreeUniverseTrail(
           this.simulation.maxTrailLength,
           typeof u.color === 'string' ? u.color : u.color[0],
@@ -1168,7 +1172,7 @@ export class RecordingVisualizer3D implements Visualizer {
             arr[ind].position.copy(b.position.clone()
               .multiplyScalar(scale));
             if (this.simulation.controls.showTrails) {
-              this.universeTrailers[i].addTrail(arr[ind].position);
+              this.universeTrails[i].addTrail(arr[ind].position);
             }
             ind++;
           });
@@ -1216,9 +1220,9 @@ export class RecordingVisualizer3D implements Visualizer {
   stop(): void {
     this.scene?.clear();
     this.scene = undefined;
-    this.universeTrailers.forEach((ut) => {
+    this.universeTrails.forEach((ut) => {
       ut.popAllTrails();
     });
-    this.universeTrailers = [];
+    this.universeTrails = [];
   }
 }
