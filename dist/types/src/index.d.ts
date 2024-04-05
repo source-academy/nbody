@@ -3,7 +3,7 @@
  * @author Yeluri Ketan
  */
 import { CelestialBody } from './CelestialBody';
-import { type Force } from './Force';
+import { LambdaForce, type Force } from './Force';
 import { CentripetalForce, CombinedForce, Gravity } from './library/Force';
 import { ExplicitEulerSim, RungeKutta4Sim, SemiImplicitEulerSim, VelocityVerletSim } from './library/SimulateFunction';
 import { LambdaSim, type SimulateFunction } from './SimulateFunction';
@@ -14,4 +14,4 @@ import { LambdaTransformation, type Transformation } from './Transformation';
 import { Universe, type UniverseConfig } from './Universe';
 import { RealTimeVisualizer, RealTimeVisualizer3D, RecordingVisualizer, RecordingVisualizer3D } from './library/Visualizer';
 import { Vector3 } from 'three';
-export { BodyCenterTransformation, CelestialBody, CentripetalForce, CombinedForce, CoMTransformation, ExplicitEulerSim, Gravity, LambdaSim, LambdaTransformation, RealTimeVisualizer, RealTimeVisualizer3D, RecordingVisualizer, RecordingVisualizer3D, RotateTransformation, RungeKutta4Sim, SemiImplicitEulerSim, Simulation, State, Universe, Vector3, VelocityVerletSim, type ControllerType, type Force, type SimulateFunction, type Transformation, type UniverseConfig, type VisType, };
+export { BodyCenterTransformation, CelestialBody, CentripetalForce, CombinedForce, CoMTransformation, ExplicitEulerSim, Gravity, LambdaForce, LambdaSim, LambdaTransformation, RealTimeVisualizer, RealTimeVisualizer3D, RecordingVisualizer, RecordingVisualizer3D, RotateTransformation, RungeKutta4Sim, SemiImplicitEulerSim, Simulation, State, Universe, Vector3, VelocityVerletSim, type ControllerType, type Force, type SimulateFunction, type Transformation, type UniverseConfig, type VisType, };
