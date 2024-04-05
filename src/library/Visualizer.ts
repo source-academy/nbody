@@ -186,6 +186,8 @@ export class RealTimeVisualizer implements Visualizer {
       },
       // uirevision: 'true',
       showlegend: false,
+      width,
+      height,
     };
 
     if (this.simulation.controller === 'ui') {
@@ -809,6 +811,8 @@ export class RecordingVisualizer implements Visualizer {
       },
       // uirevision: 'true',
       showlegend: false,
+      width,
+      height,
     };
 
     if (this.simulation.controller === 'ui') {

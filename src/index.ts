@@ -6,7 +6,7 @@ import {
   CelestialBody,
 } from './CelestialBody';
 
-import { type Force } from './Force';
+import { LambdaForce, type Force } from './Force';
 import {
   CentripetalForce, CombinedForce, Gravity,
 } from './library/Force';
@@ -38,7 +38,7 @@ import { Vector3 } from 'three';
 
 export {
   BodyCenterTransformation, CelestialBody, CentripetalForce,
-  CombinedForce, CoMTransformation, ExplicitEulerSim, Gravity, LambdaSim, LambdaTransformation, RealTimeVisualizer,
+  CombinedForce, CoMTransformation, ExplicitEulerSim, Gravity, LambdaForce, LambdaSim, LambdaTransformation, RealTimeVisualizer,
   RealTimeVisualizer3D,
   RecordingVisualizer,
   RecordingVisualizer3D,

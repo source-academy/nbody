@@ -1,0 +1,1 @@
+{"version":3,"file":"SimulateFunction.js","sourceRoot":"","sources":["../../src/SimulateFunction.ts"],"names":[],"mappings":"AAmBA;;;GAGG;AACH,MAAM,OAAO,SAAS;IAGpB;;;;;OAKG;IACH,YAAY,EAAiE;QAC3E,IAAI,CAAC,EAAE,GAAG,EAAE,CAAC;IACf,CAAC;IAED;;;;;;OAMG;IACH,QAAQ,CAAC,MAAc,EAAE,SAAgB,EAAE,SAAgB;QACzD,OAAO,IAAI,CAAC,EAAE,CAAC,MAAM,EAAE,SAAS,EAAE,SAAS,CAAC,CAAC;IAC/C,CAAC;CACF"}

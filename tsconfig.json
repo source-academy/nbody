@@ -3,6 +3,7 @@
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "declaration": true,
+    "declarationDir": "./dist/types/",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
@@ -27,5 +28,6 @@
     "src/.eslintrc.cjs",
     ".eslintrc.base.cjs",
     ".eslintrc.test.cjs",
+    "node_modules",
   ]
 }

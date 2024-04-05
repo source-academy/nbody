@@ -1,0 +1,1 @@
+{"version":3,"file":"Transformation.js","sourceRoot":"","sources":["../../src/Transformation.ts"],"names":[],"mappings":"AAiBA;;;GAGG;AACH,MAAM,OAAO,oBAAoB;IAG/B;;;;;;OAMG;IACH,YAAY,EAA2C;QACrD,IAAI,CAAC,EAAE,GAAG,EAAE,CAAC;IACf,CAAC;IAED;;;;;OAKG;IACH,SAAS,CAAC,KAAY,EAAE,MAAc;QACpC,OAAO,IAAI,CAAC,EAAE,CAAC,KAAK,EAAE,MAAM,CAAC,CAAC;IAChC,CAAC;CACF"}
