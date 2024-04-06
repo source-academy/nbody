@@ -88,4 +88,3 @@ export class RotateTransformation {
 //     return state;
 //   }
 // }
-//# sourceMappingURL=Transformation.js.map

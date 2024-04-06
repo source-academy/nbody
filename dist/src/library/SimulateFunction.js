@@ -336,4 +336,3 @@ export class RungeKutta4Sim {
             .multiplyScalar(deltaT)));
     }
 }
-//# sourceMappingURL=SimulateFunction.js.map

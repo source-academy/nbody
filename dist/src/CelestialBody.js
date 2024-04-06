@@ -29,4 +29,3 @@ export class CelestialBody {
         return new CelestialBody(this.label, this.mass, position === undefined ? this.position.clone() : position, velocity === undefined ? this.velocity.clone() : velocity, acceleration === undefined ? this.acceleration.clone() : acceleration);
     }
 }
-//# sourceMappingURL=CelestialBody.js.map

@@ -1,8 +1,9 @@
+/* eslint-disable import/extensions */
 import GUI from 'lil-gui';
 import Plotly from 'plotly.js-dist';
 import * as THREE from 'three';
-import { OrbitControls, ViewHelper } from 'three/examples/jsm/Addons';
-import Stats from 'three/examples/jsm/libs/stats.module';
+import { OrbitControls, ViewHelper } from 'three/examples/jsm/Addons.js';
+import Stats from 'three/examples/jsm/libs/stats.module.js';
 let animationId = null;
 /**
  * Clips a number to a minimum and maximum value.
@@ -1032,4 +1033,3 @@ export class RecordingVisualizer3D {
         this.universeTrails = [];
     }
 }
-//# sourceMappingURL=Visualizer.js.map

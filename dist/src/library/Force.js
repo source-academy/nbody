@@ -102,4 +102,3 @@ export class CombinedForce {
         return forceVal;
     }
 }
-//# sourceMappingURL=Force.js.map

@@ -1,8 +1,9 @@
+/* eslint-disable import/extensions */
 import GUI from 'lil-gui';
 import Plotly, { type Data, type Layout } from 'plotly.js-dist';
 import * as THREE from 'three';
-import { OrbitControls, ViewHelper } from 'three/examples/jsm/Addons';
-import Stats from 'three/examples/jsm/libs/stats.module';
+import { OrbitControls, ViewHelper } from 'three/examples/jsm/Addons.js';
+import Stats from 'three/examples/jsm/libs/stats.module.js';
 import { type Simulation } from '../Simulation';
 import { type State } from '../State';
 import { type Universe } from '../Universe';

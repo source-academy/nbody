@@ -185,4 +185,3 @@ export class Simulation {
         this.visualizer.stop();
     }
 }
-//# sourceMappingURL=Simulation.js.map

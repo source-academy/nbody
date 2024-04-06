@@ -54,4 +54,3 @@ export class Universe {
         });
     }
 }
-//# sourceMappingURL=Universe.js.map

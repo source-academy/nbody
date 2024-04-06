@@ -28,4 +28,3 @@ export class SimulationPlot {
         this.layout = layout;
     }
 }
-//# sourceMappingURL=plotly.js.map

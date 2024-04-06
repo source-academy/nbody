@@ -23,4 +23,3 @@ export class LambdaTransformation {
         return this.fn(state, deltaT);
     }
 }
-//# sourceMappingURL=Transformation.js.map
