@@ -1,9 +1,9 @@
+/* eslint-disable import/extensions */
 import GUI from 'lil-gui';
 import Plotly from 'plotly.js-dist';
 import * as THREE from 'three';
-import { OrbitControls, ViewHelper } from 'three/examples/jsm/Addons';
-import Stats from 'three/examples/jsm/libs/stats.module';
-let animationId = null;
+import { OrbitControls, ViewHelper } from 'three/examples/jsm/Addons.js';
+import Stats from 'three/examples/jsm/libs/stats.module.js';
 /**
  * Clips a number to a minimum and maximum value.
  * @param x number to clip.
@@ -79,6 +79,7 @@ export class RealTimeVisualizer {
      * @param simulation simulation object
      */
     constructor(simulation) {
+        this.animationId = null;
         this.divId = '';
         this.universeTrails = [];
         this.simulation = simulation;
@@ -125,10 +126,7 @@ export class RealTimeVisualizer {
      */
     start(divId, width, height) {
         if (this.divId !== '') {
-            // throw new Error(
-            //   'Simulation already playing. Stop the current playtime before initiating a new one.',
-            // );
-            console.error('Simulation already playing. Stop the current playtime before initiating a new one.');
+            console.error(divId, 'Simulation already playing. Stop the current playtime before initiating a new one.');
             return;
         }
         this.divId = divId;
@@ -213,8 +211,6 @@ export class RealTimeVisualizer {
             ],
         });
         const timePerFrame = 1000 / this.simulation.maxFrameRate;
-        if (animationId !== null)
-            return;
         let lastPaintTimestampMs = 0;
         let lastSimTimestampMs = 0;
         /**
@@ -234,13 +230,13 @@ export class RealTimeVisualizer {
         const paint = (timestampMs) => {
             if (this.simulation.controls.speed === 0
                 || this.simulation.controls.paused) {
-                animationId = requestAnimationFrame(paint);
+                this.animationId = requestAnimationFrame(paint);
                 return;
             }
             step(timestampMs);
             if (timePerFrame > 0
                 && timestampMs - lastPaintTimestampMs < timePerFrame) {
-                animationId = requestAnimationFrame(paint);
+                this.animationId = requestAnimationFrame(paint);
                 return;
             }
             lastPaintTimestampMs = timestampMs;
@@ -279,14 +275,19 @@ export class RealTimeVisualizer {
             if (this.simulation.showDebugInfo && stats) {
                 stats.update();
             }
-            animationId = requestAnimationFrame(paint);
+            this.animationId = requestAnimationFrame(paint);
         };
-        animationId = requestAnimationFrame(paint);
+        this.animationId = requestAnimationFrame(paint);
     }
     /**
      * Stop the simulation and visualization.
      */
     stop() {
+        console.log('stopping in viz');
+        if (this.animationId === null) {
+            return;
+        }
+        cancelAnimationFrame(this.animationId);
         Plotly.purge(this.divId);
         this.divId = '';
         this.universeTrails.forEach((ut) => {
@@ -358,6 +359,8 @@ export class RealTimeVisualizer3D {
      * @param simulation simulation object.
      */
     constructor(simulation) {
+        this.animationId = null;
+        this.renderer = null;
         this.universeTrails = [];
         this.simulation = simulation;
     }
@@ -405,10 +408,7 @@ export class RealTimeVisualizer3D {
      */
     start(divId, width, height) {
         if (this.scene !== undefined) {
-            // throw new Error(
-            //   'Simulation already playing. Stop the current playtime before initiating a new one.',
-            // );
-            console.error('Simulation already playing. Stop the current playtime before initiating a new one.');
+            console.error(divId, 'Simulation already playing. Stop the current playtime before initiating a new one.');
             return;
         }
         let element = document.getElementById(divId);
@@ -428,10 +428,10 @@ export class RealTimeVisualizer3D {
         this.scene = new THREE.Scene();
         const camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, 0, 10000000000);
         camera.position.set(0, 0, Math.max(width, height));
-        const renderer = new THREE.WebGLRenderer();
-        renderer.setSize(width, height);
-        renderer.autoClear = false;
-        element.appendChild(renderer.domElement);
+        this.renderer = new THREE.WebGLRenderer();
+        this.renderer.setSize(width, height);
+        this.renderer.autoClear = false;
+        element.appendChild(this.renderer.domElement);
         let stats;
         if (this.simulation.showDebugInfo) {
             stats = new Stats();
@@ -460,12 +460,12 @@ export class RealTimeVisualizer3D {
         // labelRenderer.domElement.style.position = 'absolute';
         // labelRenderer.domElement.style.top = '0px';
         // element.appendChild(labelRenderer.domElement);
-        const orbitControls = new OrbitControls(camera, renderer.domElement);
+        const orbitControls = new OrbitControls(camera, this.renderer.domElement);
         orbitControls.listenToKeyEvents(window);
         orbitControls.update();
         const axesHelper = new THREE.AxesHelper(width);
         this.scene.add(axesHelper);
-        const viewHelper = new ViewHelper(camera, renderer.domElement);
+        const viewHelper = new ViewHelper(camera, this.renderer.domElement);
         // var m: Map<string, THREE.LineSegments> = new Map();
         let arr = [];
         this.simulation.universes.forEach((u) => {
@@ -505,20 +505,20 @@ export class RealTimeVisualizer3D {
         const paint = (timestampMs) => {
             if (this.simulation.controls.speed === 0
                 || this.simulation.controls.paused) {
-                requestAnimationFrame(paint);
-                renderer.clear();
-                renderer.render(this.scene, camera);
-                viewHelper.render(renderer);
+                this.animationId = requestAnimationFrame(paint);
+                this.renderer.clear();
+                this.renderer.render(this.scene, camera);
+                viewHelper.render(this.renderer);
                 // labelRenderer.render(scene, camera);
                 orbitControls.update();
                 return;
             }
             step(timestampMs);
             if (timePerFrame > 0 && timestampMs - lastPaint < timePerFrame) {
-                requestAnimationFrame(paint);
-                renderer.clear();
-                renderer.render(this.scene, camera);
-                viewHelper.render(renderer);
+                this.animationId = requestAnimationFrame(paint);
+                this.renderer.clear();
+                this.renderer.render(this.scene, camera);
+                viewHelper.render(this.renderer);
                 // labelRenderer.render(scene, camera);
                 orbitControls.update();
                 return;
@@ -547,22 +547,29 @@ export class RealTimeVisualizer3D {
                     });
                 }
             });
-            requestAnimationFrame(paint);
-            renderer.clear();
-            renderer.render(this.scene, camera);
-            viewHelper.render(renderer);
+            this.animationId = requestAnimationFrame(paint);
+            this.renderer.clear();
+            this.renderer.render(this.scene, camera);
+            viewHelper.render(this.renderer);
             // labelRenderer.render(scene, camera);
             orbitControls.update();
         };
-        requestAnimationFrame(paint);
+        this.animationId = requestAnimationFrame(paint);
     }
     /**
      * Stop the simulation and visualization.
      */
     stop() {
-        var _a;
-        (_a = this.scene) === null || _a === void 0 ? void 0 : _a.clear();
+        var _a, _b, _c;
+        if (this.animationId === null) {
+            return;
+        }
+        cancelAnimationFrame(this.animationId);
+        (_a = this.renderer) === null || _a === void 0 ? void 0 : _a.clear();
+        (_b = this.renderer) === null || _b === void 0 ? void 0 : _b.dispose();
+        (_c = this.scene) === null || _c === void 0 ? void 0 : _c.clear();
         this.scene = undefined;
+        this.renderer = null;
         this.universeTrails.forEach((ut) => {
             ut.popAllTrails();
         });
@@ -579,6 +586,7 @@ export class RecordingVisualizer {
      * @param simulation simulation object
      */
     constructor(simulation) {
+        this.animationId = null;
         this.divId = '';
         this.universeTrails = [];
         this.simulation = simulation;
@@ -626,9 +634,6 @@ export class RecordingVisualizer {
      */
     start(divId, width, height, recordFor) {
         if (this.divId !== '') {
-            // throw new Error(
-            //   'Simulation already playing. Stop the current playtime before initiating a new one.',
-            // );
             console.error('Simulation already playing. Stop the current playtime before initiating a new one.');
             return;
         }
@@ -726,8 +731,6 @@ export class RecordingVisualizer {
                 'resetScale2d',
             ],
         });
-        if (animationId !== null)
-            return;
         /**
          * Paint the visualization
          * @param timestampMs current timestamp in milliseconds, provided by requestAnimationFrame
@@ -735,7 +738,7 @@ export class RecordingVisualizer {
         const paint = (timestampMs) => {
             if (this.simulation.controls.speed === 0
                 || this.simulation.controls.paused) {
-                animationId = requestAnimationFrame(paint);
+                this.animationId = requestAnimationFrame(paint);
                 return;
             }
             const currPlayInd = Math.round(playInd);
@@ -792,14 +795,18 @@ export class RecordingVisualizer {
                     playInd = totalFrames - 1;
                 }
             }
-            animationId = requestAnimationFrame(paint);
+            this.animationId = requestAnimationFrame(paint);
         };
-        animationId = requestAnimationFrame(paint);
+        this.animationId = requestAnimationFrame(paint);
     }
     /**
      * Stop the simulation and visualization.
      */
     stop() {
+        if (this.animationId === null) {
+            return;
+        }
+        cancelAnimationFrame(this.animationId);
         Plotly.purge(this.divId);
         this.divId = '';
         this.universeTrails = [];
@@ -815,6 +822,7 @@ export class RecordingVisualizer3D {
      * @param simulation simulation object.
      */
     constructor(simulation) {
+        this.animationId = null;
         this.universeTrails = [];
         this.simulation = simulation;
     }
@@ -863,9 +871,6 @@ export class RecordingVisualizer3D {
      */
     start(divId, width, height, recordFor) {
         if (this.scene !== undefined) {
-            // throw new Error(
-            //   'Simulation already playing. Stop the current playtime before initiating a new one.',
-            // );
             console.error('Simulation already playing. Stop the current playtime before initiating a new one.');
             return;
         }
@@ -961,7 +966,7 @@ export class RecordingVisualizer3D {
         const paint = (timestampMs) => {
             if (this.simulation.controls.speed === 0
                 || this.simulation.controls.paused) {
-                requestAnimationFrame(paint);
+                this.animationId = requestAnimationFrame(paint);
                 renderer.clear();
                 renderer.render(this.scene, camera);
                 viewHelper.render(renderer);
@@ -1010,20 +1015,24 @@ export class RecordingVisualizer3D {
                     playInd = totalFrames - 1;
                 }
             }
-            requestAnimationFrame(paint);
+            this.animationId = requestAnimationFrame(paint);
             renderer.clear();
             renderer.render(this.scene, camera);
             viewHelper.render(renderer);
             // labelRenderer.render(scene, camera);
             orbitControls.update();
         };
-        requestAnimationFrame(paint);
+        this.animationId = requestAnimationFrame(paint);
     }
     /**
      * Stop the simulation and visualization.
      */
     stop() {
         var _a;
+        if (this.animationId === null) {
+            return;
+        }
+        cancelAnimationFrame(this.animationId);
         (_a = this.scene) === null || _a === void 0 ? void 0 : _a.clear();
         this.scene = undefined;
         this.universeTrails.forEach((ut) => {
@@ -1032,4 +1041,3 @@ export class RecordingVisualizer3D {
         this.universeTrails = [];
     }
 }
-//# sourceMappingURL=Visualizer.js.map

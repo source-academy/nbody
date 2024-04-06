@@ -18,4 +18,3 @@ export class State {
         return new State(this.bodies.map((body) => body.clone()));
     }
 }
-//# sourceMappingURL=State.js.map

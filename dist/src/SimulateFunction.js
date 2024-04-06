@@ -23,4 +23,3 @@ export class LambdaSim {
         return this.fn(deltaT, currState, prevState);
     }
 }
-//# sourceMappingURL=SimulateFunction.js.map

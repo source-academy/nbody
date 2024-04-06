@@ -22,4 +22,3 @@ export class LambdaForce {
         return this.fn(bodies);
     }
 }
-//# sourceMappingURL=Force.js.map
