@@ -39,6 +39,7 @@ declare class PlotlyUniverseTrail {
  * @category Visualizers
  */
 export declare class RealTimeVisualizer implements Visualizer {
+    animationId: number | null;
     simulation: Simulation;
     divId: string;
     universeTrails: PlotlyUniverseTrail[];
@@ -98,6 +99,8 @@ declare class ThreeUniverseTrail {
  * @category Visualizers
  */
 export declare class RealTimeVisualizer3D implements Visualizer {
+    animationId: number | null;
+    renderer: THREE.WebGLRenderer | null;
     simulation: Simulation;
     scene?: THREE.Scene;
     universeTrails: ThreeUniverseTrail[];
@@ -128,6 +131,7 @@ export declare class RealTimeVisualizer3D implements Visualizer {
  * @category Visualizers
  */
 export declare class RecordingVisualizer implements Visualizer {
+    animationId: number | null;
     simulation: Simulation;
     divId: string;
     universeTrails: PlotlyUniverseTrail[];
@@ -159,6 +163,7 @@ export declare class RecordingVisualizer implements Visualizer {
  * @category Visualizers
  */
 export declare class RecordingVisualizer3D implements Visualizer {
+    animationId: number | null;
     simulation: Simulation;
     scene?: THREE.Scene;
     universeTrails: ThreeUniverseTrail[];

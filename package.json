@@ -25,20 +25,34 @@
     "3-body"
   ],
   "scripts": {
-    "lint": "eslint --config src/.eslintrc.cjs --quiet .",
-    "docs": "typedoc",
     "clean": "node scripts/clean.cjs",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint --config src/.eslintrc.cjs --quiet .",
+    "docs": "yarn docs:storybook && yarn docs:api",
+    "docs:api": "typedoc",
+    "docs:storybook": "storybook build -o docs",
+    "storybook": "storybook dev -p 6006",
     "build": "yarn lint && yarn clean && tsc && yarn docs",
-    "dev": "yarn clean && tsc && yarn unlink && yarn link"
+    "dev": "yarn clean && tsc && yarn unlink && yarn link",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "lil-gui": "^0.19.2"
   },
   "devDependencies": {
+    "@chromatic-com/storybook": "1.3.1",
+    "@storybook/addon-essentials": "^8.0.6",
+    "@storybook/addon-interactions": "^8.0.6",
+    "@storybook/addon-links": "^8.0.6",
+    "@storybook/addon-onboarding": "^8.0.6",
+    "@storybook/blocks": "^8.0.6",
+    "@storybook/react": "^8.0.6",
+    "@storybook/react-vite": "^8.0.6",
+    "@storybook/test": "^8.0.6",
     "@types/eslint": "^8.4.10",
     "@types/plotly.js": "^2.29.2",
     "@types/plotly.js-dist": "npm:@types/plotly.js",
+    "@types/react": "^18.2.74",
+    "@types/react-dom": "^18.2.24",
     "@types/three": "^0.163.0",
     "@typescript-eslint/eslint-plugin": "^6.6.0",
     "@typescript-eslint/parser": "^6.6.0",
@@ -53,15 +67,25 @@
     "eslint-plugin-react": "^7.29.4",
     "eslint-plugin-react-hooks": "^4.4.0",
     "eslint-plugin-simple-import-sort": "^8.0.0",
+    "eslint-plugin-storybook": "^0.8.0",
     "plotly.js-dist": "^2.30.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "storybook": "^8.0.6",
     "three": "^0.163.0",
     "typedoc": "^0.25.12",
-    "typescript": "^5.4.2"
+    "typescript": "^5.4.2",
+    "vite": "^5.2.8"
   },
   "peerDependencies": {
     "@types/plotly.js": "^2.29.2",
     "@types/three": "^0.163.0",
     "plotly.js-dist": "^2.30.1",
     "three": "^0.163.0"
+  },
+  "eslintConfig": {
+    "extends": [
+      "plugin:storybook/recommended"
+    ]
   }
 }

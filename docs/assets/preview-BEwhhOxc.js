@@ -1,0 +1,1 @@
+const t={parameters:{controls:{matchers:{color:/(background|color)$/i,date:/Date$/i}},options:{storySort:{order:["Getting started",["nbody","Installation","Integration"],"Usage","Examples"]}}}};export{t as default};
