@@ -1,0 +1,25 @@
+import { Meta, Story } from '@storybook/blocks';
+
+import * as DebugStories from "./Debug.stories";
+
+<Meta title="Visualize/Debug Info" />
+
+# Debug Info
+
+Passed as the `showDebugInfo` property in the Simulation config. This will display debug information in the corner of the simulation canvas. Click on the pop-up to toggle between frames showing the frame rate, time taken for each frame and the total memory usage.
+
+## Off (default)
+```js
+new Simulation(universe, {
+  showDebugInfo: false
+})
+```
+<center><Story of={DebugStories.DebugInfoOff} name="Off" /></center>
+
+## On
+```js
+new Simulation(universe, {
+  showDebugInfo: true
+})
+```
+<center><Story of={DebugStories.DebugInfoOn} name="On" /></center>

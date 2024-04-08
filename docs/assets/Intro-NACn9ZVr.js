@@ -1,0 +1,3 @@
+import{j as t}from"./jsx-runtime-DRTy3Uxn.js";import{useMDXComponents as i}from"./index-z5U8iC57.js";import{M as s}from"./index-iQvBBB1Z.js";import"./index-BBkUAzwr.js";import"./iframe-C3OM9s_A.js";import"../sb-preview/runtime.js";import"./index-PqR-_bA4.js";import"./index-DrlA5mbP.js";import"./index-DrFu-skq.js";function e(n){const o={h1:"h1",p:"p",...i(),...n.components};return t.jsxs(t.Fragment,{children:[t.jsx(s,{title:"Visualize/Intro"}),`
+`,t.jsx(o.h1,{id:"visualize",children:"Visualize"}),`
+`,t.jsx(o.p,{children:"This section shall explore the various setups and configurations of the visualization system."})]})}function d(n={}){const{wrapper:o}={...i(),...n.components};return o?t.jsx(o,{...n,children:t.jsx(e,{...n})}):e(n)}export{d as default};

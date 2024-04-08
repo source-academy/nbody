@@ -283,17 +283,20 @@ export class RealTimeVisualizer {
      * Stop the simulation and visualization.
      */
     stop() {
-        console.log('stopping in viz');
         if (this.animationId === null) {
             return;
         }
         cancelAnimationFrame(this.animationId);
-        Plotly.purge(this.divId);
         this.divId = '';
         this.universeTrails.forEach((ut) => {
             ut.popAllTrails();
         });
         this.universeTrails = [];
+        try {
+            Plotly.purge(this.divId);
+        }
+        catch (_) {
+        }
     }
 }
 /**
@@ -360,7 +363,10 @@ export class RealTimeVisualizer3D {
      */
     constructor(simulation) {
         this.animationId = null;
-        this.renderer = null;
+        /**
+         * Clear the visualization.
+         */
+        this.clear = () => { };
         this.universeTrails = [];
         this.simulation = simulation;
     }
@@ -428,10 +434,10 @@ export class RealTimeVisualizer3D {
         this.scene = new THREE.Scene();
         const camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, 0, 10000000000);
         camera.position.set(0, 0, Math.max(width, height));
-        this.renderer = new THREE.WebGLRenderer();
-        this.renderer.setSize(width, height);
-        this.renderer.autoClear = false;
-        element.appendChild(this.renderer.domElement);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(width, height);
+        renderer.autoClear = false;
+        element.appendChild(renderer.domElement);
         let stats;
         if (this.simulation.showDebugInfo) {
             stats = new Stats();
@@ -460,22 +466,21 @@ export class RealTimeVisualizer3D {
         // labelRenderer.domElement.style.position = 'absolute';
         // labelRenderer.domElement.style.top = '0px';
         // element.appendChild(labelRenderer.domElement);
-        const orbitControls = new OrbitControls(camera, this.renderer.domElement);
+        const orbitControls = new OrbitControls(camera, renderer.domElement);
         orbitControls.listenToKeyEvents(window);
         orbitControls.update();
         const axesHelper = new THREE.AxesHelper(width);
         this.scene.add(axesHelper);
-        const viewHelper = new ViewHelper(camera, this.renderer.domElement);
+        const viewHelper = new ViewHelper(camera, renderer.domElement);
         // var m: Map<string, THREE.LineSegments> = new Map();
         let arr = [];
         this.simulation.universes.forEach((u) => {
             this.universeTrails.push(new ThreeUniverseTrail(this.simulation.maxTrailLength, typeof u.color === 'string' ? u.color : u.color[0], this.scene, scale));
-            u.currState.bodies.forEach((b) => {
+            u.currState.bodies.forEach((b, i) => {
                 const sph = new THREE.SphereGeometry(clipMinMax(Math.log2(b.mass) - 70, 10, 40), 8, 8);
                 const curr = new THREE.WireframeGeometry(sph);
                 const line = new THREE.LineSegments(curr, new THREE.LineBasicMaterial({
-                    // @ts-ignore
-                    color: new THREE.Color(u.color),
+                    color: new THREE.Color(typeof u.color === 'string' ? u.color : u.color[i]),
                 }));
                 this.scene.add(line);
                 line.position.copy(b.position.clone()
@@ -506,9 +511,9 @@ export class RealTimeVisualizer3D {
             if (this.simulation.controls.speed === 0
                 || this.simulation.controls.paused) {
                 this.animationId = requestAnimationFrame(paint);
-                this.renderer.clear();
-                this.renderer.render(this.scene, camera);
-                viewHelper.render(this.renderer);
+                renderer.clear();
+                renderer.render(this.scene, camera);
+                viewHelper.render(renderer);
                 // labelRenderer.render(scene, camera);
                 orbitControls.update();
                 return;
@@ -516,9 +521,9 @@ export class RealTimeVisualizer3D {
             step(timestampMs);
             if (timePerFrame > 0 && timestampMs - lastPaint < timePerFrame) {
                 this.animationId = requestAnimationFrame(paint);
-                this.renderer.clear();
-                this.renderer.render(this.scene, camera);
-                viewHelper.render(this.renderer);
+                renderer.clear();
+                renderer.render(this.scene, camera);
+                viewHelper.render(renderer);
                 // labelRenderer.render(scene, camera);
                 orbitControls.update();
                 return;
@@ -548,11 +553,29 @@ export class RealTimeVisualizer3D {
                 }
             });
             this.animationId = requestAnimationFrame(paint);
-            this.renderer.clear();
-            this.renderer.render(this.scene, camera);
-            viewHelper.render(this.renderer);
+            renderer.clear();
+            renderer.render(this.scene, camera);
+            viewHelper.render(renderer);
             // labelRenderer.render(scene, camera);
             orbitControls.update();
+        };
+        /**
+         * Clear the objects and renderer.
+         */
+        this.clear = () => {
+            renderer.clear();
+            renderer.dispose();
+            arr.forEach((a) => {
+                if (Array.isArray(a.material)) {
+                    a.material.forEach((m) => {
+                        m.dispose();
+                    });
+                }
+                else {
+                    a.material.dispose();
+                }
+                a.geometry.dispose();
+            });
         };
         this.animationId = requestAnimationFrame(paint);
     }
@@ -560,16 +583,18 @@ export class RealTimeVisualizer3D {
      * Stop the simulation and visualization.
      */
     stop() {
-        var _a, _b, _c;
+        var _a;
         if (this.animationId === null) {
             return;
         }
         cancelAnimationFrame(this.animationId);
-        (_a = this.renderer) === null || _a === void 0 ? void 0 : _a.clear();
-        (_b = this.renderer) === null || _b === void 0 ? void 0 : _b.dispose();
-        (_c = this.scene) === null || _c === void 0 ? void 0 : _c.clear();
+        (_a = this.scene) === null || _a === void 0 ? void 0 : _a.clear();
         this.scene = undefined;
-        this.renderer = null;
+        this.clear();
+        /**
+         * Replace back the empty function.
+         */
+        this.clear = () => { };
         this.universeTrails.forEach((ut) => {
             ut.popAllTrails();
         });
@@ -807,9 +832,13 @@ export class RecordingVisualizer {
             return;
         }
         cancelAnimationFrame(this.animationId);
-        Plotly.purge(this.divId);
         this.divId = '';
         this.universeTrails = [];
+        try {
+            Plotly.purge(this.divId);
+        }
+        catch (_) {
+        }
     }
 }
 /**
@@ -823,6 +852,10 @@ export class RecordingVisualizer3D {
      */
     constructor(simulation) {
         this.animationId = null;
+        /**
+         * Clear the visualization.
+         */
+        this.clear = () => { };
         this.universeTrails = [];
         this.simulation = simulation;
     }
@@ -932,12 +965,11 @@ export class RecordingVisualizer3D {
         let arr = [];
         this.simulation.universes.forEach((u) => {
             this.universeTrails.push(new ThreeUniverseTrail(this.simulation.maxTrailLength, typeof u.color === 'string' ? u.color : u.color[0], this.scene, scale));
-            u.currState.bodies.forEach((b) => {
+            u.currState.bodies.forEach((b, i) => {
                 const sph = new THREE.SphereGeometry(clipMinMax(Math.log2(b.mass) - 70, 10, 40), 8, 8);
                 const curr = new THREE.WireframeGeometry(sph);
                 const line = new THREE.LineSegments(curr, new THREE.LineBasicMaterial({
-                    // @ts-ignore
-                    color: new THREE.Color(u.color),
+                    color: new THREE.Color(typeof u.color === 'string' ? u.color : u.color[i]),
                 }));
                 this.scene.add(line);
                 line.position.copy(b.position.clone()
@@ -1022,6 +1054,24 @@ export class RecordingVisualizer3D {
             // labelRenderer.render(scene, camera);
             orbitControls.update();
         };
+        /**
+         * Clear the objects and renderer.
+         */
+        this.clear = () => {
+            renderer.clear();
+            renderer.dispose();
+            arr.forEach((a) => {
+                if (Array.isArray(a.material)) {
+                    a.material.forEach((m) => {
+                        m.dispose();
+                    });
+                }
+                else {
+                    a.material.dispose();
+                }
+                a.geometry.dispose();
+            });
+        };
         this.animationId = requestAnimationFrame(paint);
     }
     /**
@@ -1035,6 +1085,11 @@ export class RecordingVisualizer3D {
         cancelAnimationFrame(this.animationId);
         (_a = this.scene) === null || _a === void 0 ? void 0 : _a.clear();
         this.scene = undefined;
+        this.clear();
+        /**
+         * Replace back the empty function.
+         */
+        this.clear = () => { };
         this.universeTrails.forEach((ut) => {
             ut.popAllTrails();
         });

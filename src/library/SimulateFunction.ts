@@ -3,6 +3,7 @@ import { type CelestialBody } from '../CelestialBody';
 import { type Force } from '../Force';
 import { type SimulateFunction } from '../SimulateFunction';
 import { State } from '../State';
+import { Gravity } from './Force';
 
 // export class VerletSim implements SimulateFunction {
 //   forceCalculator: Force;
@@ -105,7 +106,7 @@ export class VelocityVerletSim implements SimulateFunction {
    * Create a new VelocityVerletSim with the provided force calculator, which is invoked on every simulation step.
    * @param forceCalculator force calculator.
    */
-  constructor(forceCalculator: Force) {
+  constructor(forceCalculator: Force = new Gravity()) {
     this.forceCalculator = forceCalculator;
   }
 
@@ -184,7 +185,7 @@ export class ExplicitEulerSim implements SimulateFunction {
    * Create a new ExplicitEulerSim with the provided force calculator, which is invoked on every simulation step.
    * @param force force calculator.
    */
-  constructor(force: Force) {
+  constructor(force: Force = new Gravity()) {
     this.force = force;
   }
 
@@ -241,7 +242,7 @@ export class SemiImplicitEulerSim implements SimulateFunction {
    * Create a new SemiImplicitEulerSim with the provided force calculator, which is invoked on every simulation step.
    * @param force force calculator.
    */
-  constructor(force: Force) {
+  constructor(force: Force = new Gravity()) {
     this.force = force;
   }
 
@@ -320,7 +321,7 @@ export class RungeKutta4Sim implements SimulateFunction {
    * @param force force calculator.
    * @param weights weights for weighted average.
    */
-  constructor(force: Force, weights: number[]) {
+  constructor(force: Force = new Gravity(), weights: number[] = [1, 2, 2, 1]) {
     this.force = force;
     if (weights.length !== 4) {
       throw new Error('Weights for RK4 must be of length 4');

@@ -1,0 +1,72 @@
+import { Meta, Story } from '@storybook/blocks';
+
+<Meta title="Define/Transformation" />
+
+# Transformation
+
+TODO
+
+```typescript
+export interface Transformation {
+  transform(state: State, deltaT: number): State;
+}
+```
+
+Full API reference can be found [here](https://source-academy.github.io/nbody/api/interfaces/Transformation.html).
+
+- [Inbuilt Transformations](#inbuilt-transformations)
+- [Javascript](#javascript)
+- [Typescript](#typescript)
+
+## Inbuilt Transformations
+
+### Body Center Transformation
+
+TODO
+
+```javascript
+new BodyCenterTransformation();
+```
+
+### Center of Mass Transformation
+
+TODO
+
+```javascript
+new CoMTransformation();
+```
+
+### Rotate Transformation
+
+TODO
+
+```javascript
+new RotateTransformation(new Vector3(0, 1, 0), Math.PI / 2);
+```
+
+### Lambda Transformation
+
+TODO
+
+```javascript
+new LambdaTransformation((state, deltaT) => {
+  // your transformation logic here
+  return state;
+});
+```
+
+## Javascript
+
+You can define and configure your own transformation object in javascript with a transform method as follows
+
+```javascript
+TODO
+```
+
+## Typescript
+
+You can define and configure your own transformation object in typescript by implementing the Transformation interface as follows
+
+```typescript
+TODO
+```

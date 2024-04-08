@@ -1,0 +1,25 @@
+import { Meta, Story } from '@storybook/blocks';
+
+import * as DimensionStories from "./Dimension.stories";
+
+<Meta title="Visualize/Dimension" />
+
+# Dimension
+
+TODO
+
+## 2D (default)
+```js
+new Simulation(universe, {
+  visType: '2D',
+})
+```
+<center><Story of={DimensionStories.TwoD} name="2D" /></center>
+
+## 3D
+```js
+new Simulation(universe, {
+  visType: '3D',
+})
+```
+<center><Story of={DimensionStories.ThreeD} name="3D" /></center>

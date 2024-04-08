@@ -23,7 +23,10 @@ import { State } from './State';
 
 import {
   BodyCenterTransformation,
-  CoMTransformation, RotateTransformation,
+  CoMTransformation,
+  PinTransformation,
+  RotateTransformation,
+  TimedRotateTransformation,
 } from './library/Transformation';
 import { LambdaTransformation, type Transformation } from './Transformation';
 
@@ -38,10 +41,8 @@ import { Vector3 } from 'three';
 
 export {
   BodyCenterTransformation, CelestialBody, CentripetalForce,
-  CombinedForce, CoMTransformation, ExplicitEulerSim, Gravity, LambdaForce, LambdaSim, LambdaTransformation, RealTimeVisualizer,
-  RealTimeVisualizer3D,
-  RecordingVisualizer,
+  CombinedForce, CoMTransformation, ExplicitEulerSim, Gravity, LambdaForce, LambdaSim, LambdaTransformation, PinTransformation, RealTimeVisualizer,
+  RealTimeVisualizer3D, RecordingVisualizer,
   RecordingVisualizer3D,
-  RotateTransformation, RungeKutta4Sim,
-  SemiImplicitEulerSim, Simulation, State, Universe, Vector3, VelocityVerletSim, type ControllerType, type Force, type SimulateFunction, type Transformation, type UniverseConfig, type VisType,
+  RotateTransformation, RungeKutta4Sim, SemiImplicitEulerSim, Simulation, State, TimedRotateTransformation, Universe, Vector3, VelocityVerletSim, type ControllerType, type Force, type SimulateFunction, type Transformation, type UniverseConfig, type VisType,
 };

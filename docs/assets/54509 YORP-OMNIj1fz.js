@@ -1,0 +1,4 @@
+import{j as o}from"./jsx-runtime-DRTy3Uxn.js";import{useMDXComponents as e}from"./index-z5U8iC57.js";import{M as i,d as s}from"./index-iQvBBB1Z.js";import{YORP as m}from"./HorseshoeOrbit.stories-BMFTqkxu.js";import"./index-BBkUAzwr.js";import"./iframe-C3OM9s_A.js";import"../sb-preview/runtime.js";import"./index-PqR-_bA4.js";import"./index-DrlA5mbP.js";import"./index-DrFu-skq.js";import"./Simulation-7H4WISkI.js";import"./Transformation-KUb0IKcR.js";function n(t){const r={h1:"h1",p:"p",...e(),...t.components};return o.jsxs(o.Fragment,{children:[o.jsx(i,{title:"Showcase/HorseshoeOrbit/54509 YORP"}),`
+`,o.jsx(r.h1,{id:"54509-yorp",children:"54509 YORP"}),`
+`,o.jsx(r.p,{children:"54509 YORP is an Earth co-orbital asteroid that follows a horse shoe orbit"}),`
+`,o.jsx(s,{of:m})]})}function R(t={}){const{wrapper:r}={...e(),...t.components};return r?o.jsx(r,{...t,children:o.jsx(n,{...t})}):n(t)}export{R as default};

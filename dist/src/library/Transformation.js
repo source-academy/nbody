@@ -1,16 +1,23 @@
 import { Vector3 } from 'three';
 /**
- * Frame of reference transformation to the center of the first body in the system.
+ * Frame of reference transformation to the center of body i in the system.
  * @category Transformations
  */
 export class BodyCenterTransformation {
+    /**
+     * Create a new BodyCenterTransformer.
+     * @param index index of the body to transform to.
+     */
+    constructor(index) {
+        this.index = index;
+    }
     /**
      * Transform the frame of reference to the center of the first body in the system.
      * @param state state to transform.
      * @returns transformed state.
      */
     transform(state) {
-        const transform = state.bodies[0].position.clone();
+        const transform = state.bodies[this.index].position.clone();
         state.bodies.forEach((b) => {
             b.position.sub(transform);
         });
@@ -70,21 +77,64 @@ export class RotateTransformation {
         return state;
     }
 }
-// export class PinTransformer implements Transformer {
-//   readonly axis: Vector3;
-//   readonly index: number;
-//   constructor(axis: Vector3, index: number) {
-//     this.axis = axis;
-//     this.index = index
-//   }
-//   transform(state: State): State {
-//     const angle = state.bodies[this.index].position.clone().angleTo(this.axis);
-//     const pivot = state.bodies[this.index].position.clone().cross(this.axis.clone()).normalize();
-//     state.bodies.forEach((b) => {
-//       b.position.applyAxisAngle(pivot.clone(), angle);
-//       b.velocity.applyAxisAngle(pivot.clone(), angle);
-//       b.acceleration.applyAxisAngle(pivot.clone(), angle);
-//     });
-//     return state;
-//   }
-// }
+/**
+ * Frame of reference transformation to a pin body i to the given axis.
+ */
+export class PinTransformation {
+    /**
+     * Create a new PinTransformer.
+     * @param axis axis to pin to.
+     * @param index index of the body to pin.
+     */
+    constructor(axis, index) {
+        this.axis = axis;
+        this.index = index;
+    }
+    /**
+     * Transform the frame of reference to a pin body i to the given axis.
+     * @param state state to transform.
+     * @returns transformed state.
+     */
+    transform(state) {
+        const angle = state.bodies[this.index].position.clone()
+            .angleTo(this.axis.clone());
+        const pivot = state.bodies[this.index].position.clone()
+            .cross(this.axis.clone())
+            .normalize();
+        state.bodies.forEach((b) => {
+            b.position.applyAxisAngle(pivot.clone(), angle);
+            b.velocity.applyAxisAngle(pivot.clone(), angle);
+            b.acceleration.applyAxisAngle(pivot.clone(), angle);
+        });
+        return state;
+    }
+}
+/**
+ * Frame of reference transformation to rotate around an axis by 360 degrees in a given time.
+ */
+export class TimedRotateTransformation {
+    /**
+     * Create a new TimedRotateTransformer.
+     * @param axis axis to rotate around.
+     * @param revolutionTime time in seconds for one full revolution.
+     */
+    constructor(axis, revolutionTime) {
+        this.axis = axis;
+        this.revolutionTime = revolutionTime;
+    }
+    /**
+     * Transform the frame of reference to rotate around an axis by an angle determined by the time elapsed.
+     * @param state state to transform.
+     * @param deltaT time elapsed.
+     * @returns transformed state.
+     */
+    transform(state, deltaT) {
+        const angle = -(deltaT / this.revolutionTime) * Math.PI * 2;
+        state.bodies.forEach((b) => {
+            b.position.applyAxisAngle(this.axis, angle);
+            b.velocity.applyAxisAngle(this.axis, angle);
+            b.acceleration.applyAxisAngle(this.axis, angle);
+        });
+        return state;
+    }
+}
