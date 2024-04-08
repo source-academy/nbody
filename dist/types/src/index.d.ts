@@ -9,9 +9,9 @@ import { ExplicitEulerSim, RungeKutta4Sim, SemiImplicitEulerSim, VelocityVerletS
 import { LambdaSim, type SimulateFunction } from './SimulateFunction';
 import { Simulation, type ControllerType, type VisType } from './Simulation';
 import { State } from './State';
-import { BodyCenterTransformation, CoMTransformation, RotateTransformation } from './library/Transformation';
+import { BodyCenterTransformation, CoMTransformation, PinTransformation, RotateTransformation, TimedRotateTransformation } from './library/Transformation';
 import { LambdaTransformation, type Transformation } from './Transformation';
 import { Universe, type UniverseConfig } from './Universe';
 import { RealTimeVisualizer, RealTimeVisualizer3D, RecordingVisualizer, RecordingVisualizer3D } from './library/Visualizer';
 import { Vector3 } from 'three';
-export { BodyCenterTransformation, CelestialBody, CentripetalForce, CombinedForce, CoMTransformation, ExplicitEulerSim, Gravity, LambdaForce, LambdaSim, LambdaTransformation, RealTimeVisualizer, RealTimeVisualizer3D, RecordingVisualizer, RecordingVisualizer3D, RotateTransformation, RungeKutta4Sim, SemiImplicitEulerSim, Simulation, State, Universe, Vector3, VelocityVerletSim, type ControllerType, type Force, type SimulateFunction, type Transformation, type UniverseConfig, type VisType, };
+export { BodyCenterTransformation, CelestialBody, CentripetalForce, CombinedForce, CoMTransformation, ExplicitEulerSim, Gravity, LambdaForce, LambdaSim, LambdaTransformation, PinTransformation, RealTimeVisualizer, RealTimeVisualizer3D, RecordingVisualizer, RecordingVisualizer3D, RotateTransformation, RungeKutta4Sim, SemiImplicitEulerSim, Simulation, State, TimedRotateTransformation, Universe, Vector3, VelocityVerletSim, type ControllerType, type Force, type SimulateFunction, type Transformation, type UniverseConfig, type VisType, };

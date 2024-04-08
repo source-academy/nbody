@@ -1,0 +1,132 @@
+import { Meta, Story } from '@storybook/blocks';
+
+<Meta title="Define/Force" />
+
+# Force
+
+A force object encapsulates logic for calculating forces acting on celestial bodies due to other objects or environment. It has a getForces method that takes in an array of celestial bodies and returns an array of forces acting on each body. It is defined as the following Typescript interface.
+
+```typescript
+interface Force {
+  getForces(bodies: CelestialBody[]): Vector3[];
+}
+```
+
+Full API reference can be found [here](https://source-academy.github.io/nbody/api/interfaces/Force.html).
+
+- [Inbuilt Forces](#inbuilt-forces)
+- [Javascript](#javascript)
+- [Typescript](#typescript)
+
+## Inbuilt Forces
+
+### Gravity
+
+Create a [newtonian gravitational](https://en.wikipedia.org/wiki/Newton%27s_law_of_universal_gravitation) force object with a gravitational constant of `6.674e-11`. You can also pass in a custom gravitational constant.
+
+```javascript
+new Gravity();
+new Gravity(10);
+```
+
+### Centripetal Force
+
+Create a [centripetal](https://en.wikipedia.org/wiki/Centripetal_force) force object with a center of rotation. Default center is `(0, 0, 0)`.
+
+```javascript
+new CentripetalForce();
+new CentripetalForce(new Vector3(x, y, z));
+```
+
+### Combined Force
+
+Create a force object that is a result of additively combining multiple forces acting on a system of bodies.
+
+```javascript
+new CombinedForce([new Gravity(), new CentripetalForce()]);
+```
+
+### Lambda Force
+
+Create a force object that uses a [lambda/arrow](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions) function to calculate forces.
+
+```javascript
+new LambdaForce((bodies) => {
+  return bodies.map(body => new Vector3(0, 0, 0)); // zero force
+});
+```
+
+## Javascript
+
+You can define and configure your own force object in javascript with a getForces method as follows
+
+```javascript
+// gravitational constant
+const G = 6.67430e-11;
+
+// define your own newtonian gravitational force
+const gravity = {
+  // must contain a getForces method
+  getForces(bodies) {
+    let n = bodies.length;
+    let ans = [];
+    for (let i = 0; i < n; i++) {
+      ans.push(new Vector3(0, 0, 0));
+    }
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) {
+        let currForce = this.calcNewtonian(bodies[i], bodies[j]);
+        ans[i].add(currForce);
+        ans[j].sub(currForce);
+      }
+    }
+    return ans;
+  },
+  // helper function to calculate force between two bodies
+  calcNewtonian(a, b) {
+    let distSq = a.position.distanceToSquared(b.position);
+    let forceVal = (G * a.mass * b.mass) / distSq;
+    return b.position
+      .clone()
+      .sub(a.position)
+      .normalize()
+      .multiplyScalar(forceVal);
+  }
+}
+```
+
+## Typescript
+
+You can define and configure your own force object in typescript by implementing the Force interface as follows
+
+```typescript
+class Gravity implements Force {
+  readonly G: number = 6.674e-11;
+
+  getForces(bodies: CelestialBody[]): Vector3[] {
+    let n = bodies.length;
+    let ans: Vector3[] = [];
+    for (let i = 0; i < n; i++) {
+      ans.push(new Vector3(0, 0, 0));
+    }
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) {
+        let currForce = this.calcNewtonian(bodies[i], bodies[j]);
+        ans[i].add(currForce);
+        ans[j].sub(currForce);
+      }
+    }
+    return ans;
+  }
+
+  private calcNewtonian(a: CelestialBody, b: CelestialBody): Vector3 {
+    let distSq = a.position.distanceToSquared(b.position);
+    let forceVal = (this.G * a.mass * b.mass) / distSq;
+    return b.position
+      .clone()
+      .sub(a.position)
+      .normalize()
+      .multiplyScalar(forceVal);
+  }
+}
+```

@@ -1,8 +1,10 @@
 import { Meta, Story } from '@storybook/blocks';
 
-<Meta title="Getting Started/Installation" />
+<Meta title="Installation" />
 
-# Installation guide
+# Installation
+
+## Via npm registry
 nbody is available on the npm registry as [nbody](https://www.npmjs.com/package/nbody). Simply follow the following install commands based on your package manager. Since nbody relies on [three](https://threejs.org/) and [Plotly.js](https://plotly.com/javascript/) for visualization of the simulations, they have to be installed alongside nbody.
 
 If you are using Typescript, you may also have to install type definitions as well.
@@ -18,3 +20,14 @@ or
 yarn add nbody three plotly.js-dist
 yarn add -D @types/three @types/plotly.js
 ```
+
+## Via CDN
+
+> **WARNING**: Using nbody via the CDN may not work as intended as peer dependencies of three and plotly.js would not be accessible to nbody during runtime. A bundled version is in the roadmap for future development - consider [contributing](?path=/docs/getting-started-contribute--docs).
+
+nbody is available via the unpkg CDN as follows.
+
+```html
+<script src="https://unpkg.com/nbody"></script>
+```
+

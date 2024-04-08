@@ -1,0 +1,128 @@
+import { Meta, Story } from "@storybook/blocks";
+
+import * as Stories from "./Visualize/Dimension/Dimension.stories";
+
+<Meta title="Quick Start" />
+
+# Quick Start
+
+A quick start guide to configuring, simulating and visualizing a simple nbody simulation.
+
+- [Creating vectors](#creating-vectors)
+- [Creating bodies](#creating-bodies)
+- [Define a force](#define-a-force)
+- [Define a simulate function](#define-a-simulate-function)
+- [Creating a state](#creating-a-state)
+- [Creating an universe](#creating-an-universe)
+- [Put it all together](#put-it-all-together)
+- [Next Steps](#next-steps)
+
+## Creating vectors
+
+A `Vector3` is a 3D vector with `x`, `y`, and `z` components. It is used to represent kinematic properties such as _position_, _velocity_, and _acceleration_.
+
+Create a vector object using the `Vector3` class. Inherited from **three.js** Vector3, full documentation can be found [here](https://threejs.org/docs/#api/en/math/Vector3).
+
+```javascript
+let testVector = new Vector3(1, 2, 3);
+```
+
+## Creating bodies
+
+A `CelestialBody` is a celestial object with a _mass_ and kinematic properties such as _position_, _velocity_, and _acceleration_. It also has a unique _label_ for identification purposes.
+
+Create celestial bodies using the `CelestialBody` class. Full API reference can be found [here](https://source-academy.github.io/nbody/api/classes/CelestialBody.html).
+
+```javascript
+let body1 = new CelestialBody(
+  "Body 1", // label
+  1, // mass
+  new Vector3(-0.97000436, 0.24308753, 0), // position
+  new Vector3(0.466203685, 0.43236573, 0), // velocity
+  new Vector3(0, 0, 0) // acceleration
+);
+
+let body2 = new CelestialBody(
+  "Body 2",
+  1,
+  new Vector3(0.97000436, -0.24308753, 0),
+  new Vector3(0.466203685, 0.43236573, 0),
+  new Vector3(0, 0, 0)
+);
+
+let body3 = new CelestialBody(
+  "Body 3",
+  1,
+  new Vector3(0, 0, 0),
+  new Vector3(-2 * 0.466203685, -2 * 0.43236573, 0),
+  new Vector3(0, 0, 0)
+);
+```
+
+## Define a force
+
+A force object encapsulates logic for calculating forces acting on celestial bodies due to other objects or environment.
+
+Create a force object using the `Force` interface or use one of the predefined forces. Full API reference can be found [here](https://source-academy.github.io/nbody/api/interfaces/Force.html).
+
+```javascript
+// define a gravitational force with a strength of 1
+const customForce = new Gravity(1);
+```
+
+## Define a simulate function
+
+A simulate function object encapsulates logic for advancing the state of the universe over time using numerical integration.
+
+Create a simulate function (or [numerical integrator](https://en.wikipedia.org/wiki/Numerical_integration)) object using the `SimulateFunction` interface or use one of the predefined simulate functions. Full API reference can be found [here](https://source-academy.github.io/nbody/api/interfaces/SimulateFunction.html).
+
+```javascript
+// define an explicit Euler integrator with the custom force
+const customSimFunc = new ExplicitEulerSim(customForce);
+```
+
+## Creating a state
+
+A State is a snapshot of the universe at a given time. It contains an array of celestial bodies.
+
+Create a state object using the `State` class. Full API reference can be found [here](https://source-academy.github.io/nbody/api/classes/State.html).
+
+```javascript
+// create a State object with the array of celestial bodies
+let customState = new State([body1, body2]);
+```
+
+## Creating an universe
+
+A Universe is a container for the current state and previous states of the universe and the simulation function. It also has a unique label for identification purposes.
+
+Create a universe object using the `Universe` class. Full API reference can be found [here](https://source-academy.github.io/nbody/api/classes/Universe.html).
+
+```javascript
+let universe = new Universe({
+  label: "Universe 1",
+  currState: customState,
+  simFunc: customSimFunc,
+});
+```
+
+## Put it all together
+
+A Simulation object controls the universe(s), simulation loop and rendering of the simulation.
+
+Create a simulation object using the `Simulation` class. Full API reference can be found [here](https://source-academy.github.io/nbody/api/classes/Simulation.html).
+
+```javascript
+let simulation = new Simulation(universe, {});
+simulation.start(<div-id>, 800, 800);
+```
+
+<center>
+  <Story of={Stories.TwoD} />
+</center>
+
+You've done it! You just simulated a special configuration of the [three-body](https://en.wikipedia.org/wiki/Three-body_problem) system using the _nbody_ library. Feel free to experiment with different configurations to see how systems evolve over time with various forces, integrators and transformations (read on to find out what those are).
+
+## Next Steps
+
+Checkout the [Configuration](?path=/docs/configuration-configuration--docs) section to learn how to configure a simulation with greater detail and customization.

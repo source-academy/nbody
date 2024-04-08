@@ -14,7 +14,7 @@ export declare class VelocityVerletSim implements SimulateFunction {
      * Create a new VelocityVerletSim with the provided force calculator, which is invoked on every simulation step.
      * @param forceCalculator force calculator.
      */
-    constructor(forceCalculator: Force);
+    constructor(forceCalculator?: Force);
     /**
      * Simulate a step in the Universe by using the previous and/or current state and a time step, using the Velocity Verlet integration method.
      * @param deltaT time step.
@@ -48,7 +48,7 @@ export declare class ExplicitEulerSim implements SimulateFunction {
      * Create a new ExplicitEulerSim with the provided force calculator, which is invoked on every simulation step.
      * @param force force calculator.
      */
-    constructor(force: Force);
+    constructor(force?: Force);
     /**
      * Simulate a step in the Universe by using the current state and a time step, using the Euler integration method.
      * @param deltaT time step.
@@ -79,7 +79,7 @@ export declare class SemiImplicitEulerSim implements SimulateFunction {
      * Create a new SemiImplicitEulerSim with the provided force calculator, which is invoked on every simulation step.
      * @param force force calculator.
      */
-    constructor(force: Force);
+    constructor(force?: Force);
     /**
      * Simulate a step in the Universe by using the current state and a time step, using the Semi-Implicit Euler integration method.
      * @param deltaT time step.
@@ -115,7 +115,7 @@ export declare class RungeKutta4Sim implements SimulateFunction {
      * @param force force calculator.
      * @param weights weights for weighted average.
      */
-    constructor(force: Force, weights: number[]);
+    constructor(force?: Force, weights?: number[]);
     /**
      * Simulate a step in the Universe by using the current state and a time step, using the Runge-Kutta 4 integration method.
      * @param deltaT time step.

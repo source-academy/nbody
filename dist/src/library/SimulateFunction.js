@@ -1,5 +1,6 @@
 import { Vector3 } from 'three';
 import { State } from '../State';
+import { Gravity } from './Force';
 // export class VerletSim implements SimulateFunction {
 //   forceCalculator: Force;
 //   prevDeltaT: number | undefined = undefined;
@@ -84,7 +85,7 @@ export class VelocityVerletSim {
      * Create a new VelocityVerletSim with the provided force calculator, which is invoked on every simulation step.
      * @param forceCalculator force calculator.
      */
-    constructor(forceCalculator) {
+    constructor(forceCalculator = new Gravity()) {
         this.forceCalculator = forceCalculator;
     }
     /**
@@ -143,7 +144,7 @@ export class ExplicitEulerSim {
      * Create a new ExplicitEulerSim with the provided force calculator, which is invoked on every simulation step.
      * @param force force calculator.
      */
-    constructor(force) {
+    constructor(force = new Gravity()) {
         this.force = force;
     }
     /**
@@ -188,7 +189,7 @@ export class SemiImplicitEulerSim {
      * Create a new SemiImplicitEulerSim with the provided force calculator, which is invoked on every simulation step.
      * @param force force calculator.
      */
-    constructor(force) {
+    constructor(force = new Gravity()) {
         this.force = force;
     }
     /**
@@ -236,7 +237,7 @@ export class RungeKutta4Sim {
      * @param force force calculator.
      * @param weights weights for weighted average.
      */
-    constructor(force, weights) {
+    constructor(force = new Gravity(), weights = [1, 2, 2, 1]) {
         this.force = force;
         if (weights.length !== 4) {
             throw new Error('Weights for RK4 must be of length 4');

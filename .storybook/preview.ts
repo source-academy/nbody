@@ -9,7 +9,7 @@ const preview: Preview = {
       },
     }, options: {
       storySort: {
-        order: ['Getting started', ['nbody', 'Installation', 'Integration'], 'Usage', 'Examples'],
+        order: ['nbody', 'Installation', 'Quick Start', 'Integration', 'Contribute', 'Define', ['Intro', 'Force', 'Simulate Function', 'Transformation'], 'Visualize', ['Intro', 'Dimension', 'Multiverse', 'Record', 'Controller', 'Trails', 'Debug Info'], 'Showcase', ['Intro', 'Analemma', ['Intro', 'Sun-Earth'],'HorseshoeOrbit', ['Intro', '54509 YORP'], 'SolarSystem']],
       },
     }
   },

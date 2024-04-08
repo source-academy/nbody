@@ -29,7 +29,7 @@
     "lint": "eslint --config src/.eslintrc.cjs --quiet .",
     "docs": "yarn docs:storybook && yarn docs:api",
     "docs:api": "typedoc",
-    "docs:storybook": "storybook build -o docs",
+    "docs:storybook": "storybook build --docs -o docs",
     "storybook": "storybook dev -p 6006",
     "build": "yarn lint && yarn clean && tsc && yarn docs",
     "dev": "yarn clean && tsc && yarn unlink && yarn link",

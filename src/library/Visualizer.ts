@@ -333,17 +333,19 @@ export class RealTimeVisualizer implements Visualizer {
    * Stop the simulation and visualization.
    */
   stop(): void {
-    console.log('stopping in viz');
     if (this.animationId === null) {
       return;
     }
     cancelAnimationFrame(this.animationId);
-    Plotly.purge(this.divId);
     this.divId = '';
     this.universeTrails.forEach((ut) => {
       ut.popAllTrails();
     });
     this.universeTrails = [];
+    try {
+      Plotly.purge(this.divId);
+    } catch (_) {
+    }
   }
 }
 
@@ -436,7 +438,10 @@ class ThreeUniverseTrail {
  */
 export class RealTimeVisualizer3D implements Visualizer {
   animationId: number | null = null;
-  renderer: THREE.WebGLRenderer | null = null;
+  /**
+   * Clear the visualization.
+   */
+  clear: () => void = () => { };
   simulation: Simulation;
   scene?: THREE.Scene;
   universeTrails: ThreeUniverseTrail[] = [];
@@ -525,10 +530,10 @@ export class RealTimeVisualizer3D implements Visualizer {
     );
     camera.position.set(0, 0, Math.max(width, height));
 
-    this.renderer = new THREE.WebGLRenderer();
-    this.renderer.setSize(width, height);
-    this.renderer.autoClear = false;
-    element.appendChild(this.renderer.domElement);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(width, height);
+    renderer.autoClear = false;
+    element.appendChild(renderer.domElement);
 
     let stats: Stats | undefined;
     if (this.simulation.showDebugInfo) {
@@ -562,13 +567,13 @@ export class RealTimeVisualizer3D implements Visualizer {
     // labelRenderer.domElement.style.top = '0px';
     // element.appendChild(labelRenderer.domElement);
 
-    const orbitControls = new OrbitControls(camera, this.renderer.domElement);
+    const orbitControls = new OrbitControls(camera, renderer.domElement);
     orbitControls.listenToKeyEvents(window);
     orbitControls.update();
 
     const axesHelper = new THREE.AxesHelper(width);
     this.scene.add(axesHelper);
-    const viewHelper = new ViewHelper(camera, this.renderer.domElement);
+    const viewHelper = new ViewHelper(camera, renderer.domElement);
 
     // var m: Map<string, THREE.LineSegments> = new Map();
     let arr: THREE.LineSegments[] = [];
@@ -582,7 +587,7 @@ export class RealTimeVisualizer3D implements Visualizer {
           scale,
         ),
       );
-      u.currState.bodies.forEach((b) => {
+      u.currState.bodies.forEach((b, i) => {
         const sph = new THREE.SphereGeometry(
           clipMinMax(Math.log2(b.mass) - 70, 10, 40),
           8,
@@ -592,8 +597,9 @@ export class RealTimeVisualizer3D implements Visualizer {
         const line = new THREE.LineSegments(
           curr,
           new THREE.LineBasicMaterial({
-            // @ts-ignore
-            color: new THREE.Color(u.color),
+            color: new THREE.Color(
+              typeof u.color === 'string' ? u.color : u.color[i],
+            ),
           }),
         );
         this.scene!.add(line);
@@ -632,9 +638,9 @@ export class RealTimeVisualizer3D implements Visualizer {
         || this.simulation.controls.paused
       ) {
         this.animationId = requestAnimationFrame(paint);
-        this.renderer!.clear();
-        this.renderer!.render(this.scene!, camera);
-        viewHelper.render(this.renderer!);
+        renderer.clear();
+        renderer.render(this.scene!, camera);
+        viewHelper.render(renderer);
         // labelRenderer.render(scene, camera);
         orbitControls.update();
         return;
@@ -643,9 +649,9 @@ export class RealTimeVisualizer3D implements Visualizer {
 
       if (timePerFrame > 0 && timestampMs - lastPaint < timePerFrame) {
         this.animationId = requestAnimationFrame(paint);
-        this.renderer!.clear();
-        this.renderer!.render(this.scene!, camera);
-        viewHelper.render(this.renderer!);
+        renderer.clear();
+        renderer.render(this.scene!, camera);
+        viewHelper.render(renderer);
         // labelRenderer.render(scene, camera);
         orbitControls.update();
         return;
@@ -676,11 +682,29 @@ export class RealTimeVisualizer3D implements Visualizer {
         }
       });
       this.animationId = requestAnimationFrame(paint);
-      this.renderer!.clear();
-      this.renderer!.render(this.scene!, camera);
-      viewHelper.render(this.renderer!);
+      renderer.clear();
+      renderer.render(this.scene!, camera);
+      viewHelper.render(renderer);
       // labelRenderer.render(scene, camera);
       orbitControls.update();
+    };
+
+    /**
+     * Clear the objects and renderer.
+     */
+    this.clear = () => {
+      renderer.clear();
+      renderer.dispose();
+      arr.forEach((a) => {
+        if (Array.isArray(a.material)) {
+          a.material.forEach((m) => {
+            m.dispose();
+          });
+        } else {
+          a.material.dispose();
+        }
+        a.geometry.dispose();
+      });
     };
 
     this.animationId = requestAnimationFrame(paint);
@@ -694,11 +718,13 @@ export class RealTimeVisualizer3D implements Visualizer {
       return;
     }
     cancelAnimationFrame(this.animationId);
-    this.renderer?.clear();
-    this.renderer?.dispose();
     this.scene?.clear();
     this.scene = undefined;
-    this.renderer = null;
+    this.clear();
+    /**
+     * Replace back the empty function.
+     */
+    this.clear = () => { };
     this.universeTrails.forEach((ut) => {
       ut.popAllTrails();
     });
@@ -961,9 +987,12 @@ export class RecordingVisualizer implements Visualizer {
       return;
     }
     cancelAnimationFrame(this.animationId);
-    Plotly.purge(this.divId);
     this.divId = '';
     this.universeTrails = [];
+    try {
+      Plotly.purge(this.divId);
+    } catch (_) {
+    }
   }
 }
 
@@ -973,6 +1002,10 @@ export class RecordingVisualizer implements Visualizer {
  */
 export class RecordingVisualizer3D implements Visualizer {
   animationId: number | null = null;
+  /**
+   * Clear the visualization.
+   */
+  clear: () => void = () => { };
   simulation: Simulation;
   scene?: THREE.Scene;
   universeTrails: ThreeUniverseTrail[] = [];
@@ -1118,7 +1151,7 @@ export class RecordingVisualizer3D implements Visualizer {
           scale,
         ),
       );
-      u.currState.bodies.forEach((b) => {
+      u.currState.bodies.forEach((b, i) => {
         const sph = new THREE.SphereGeometry(
           clipMinMax(Math.log2(b.mass) - 70, 10, 40),
           8,
@@ -1128,8 +1161,9 @@ export class RecordingVisualizer3D implements Visualizer {
         const line = new THREE.LineSegments(
           curr,
           new THREE.LineBasicMaterial({
-            // @ts-ignore
-            color: new THREE.Color(u.color),
+            color: new THREE.Color(
+              typeof u.color === 'string' ? u.color : u.color[i],
+            ),
           }),
         );
         this.scene!.add(line);
@@ -1220,6 +1254,23 @@ export class RecordingVisualizer3D implements Visualizer {
       orbitControls.update();
     };
 
+    /**
+     * Clear the objects and renderer.
+     */
+    this.clear = () => {
+      renderer.clear();
+      renderer.dispose();
+      arr.forEach((a) => {
+        if (Array.isArray(a.material)) {
+          a.material.forEach((m) => {
+            m.dispose();
+          });
+        } else {
+          a.material.dispose();
+        }
+        a.geometry.dispose();
+      });
+    };
     this.animationId = requestAnimationFrame(paint);
   }
 
@@ -1233,6 +1284,11 @@ export class RecordingVisualizer3D implements Visualizer {
     cancelAnimationFrame(this.animationId);
     this.scene?.clear();
     this.scene = undefined;
+    this.clear();
+    /**
+     * Replace back the empty function.
+     */
+    this.clear = () => { };
     this.universeTrails.forEach((ut) => {
       ut.popAllTrails();
     });

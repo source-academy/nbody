@@ -1,20 +1,22 @@
-import { Meta, Story } from '@storybook/blocks';
+import { Meta, Story } from "@storybook/blocks";
 
-<Meta title="Getting Started/Integration" />
+<Meta title="Integration" />
 
 # Integration
 
 Once installed into your `node_modules`, you can use **nbody** in your choice of your frontend framework just like you would any other client side library.
 
 ## Table of Contents
+
 - [Compatible Frameworks](#compatible-frameworks)
 - [React](#react)
 - [Typescript](#typescript)
 
 ## Compatible Frameworks
 
-Following combinations of Frontend frameworks + build tools + dev tools have been tested to be compatible with nbody. Consider raising a [request](https://github.com/source-academy/nbody/issues) if any frameworks are missing. Additionally do consider contributing to the project directly.
+Following combinations of Frontend frameworks + build tools + dev tools have been tested to be compatible with nbody. Consider raising a [request](https://github.com/source-academy/nbody/issues) if any frameworks are missing. Additionally do consider [contributing](?path=/docs/contribute--docs) to the project directly.
 
+- Plain HTML + JS
 - React + Vite
 - React + Vite + TS
 - React + Webpack
@@ -22,60 +24,12 @@ Following combinations of Frontend frameworks + build tools + dev tools have bee
 
 ## React
 
+### Using ref
+
 ```javascript
-import {
-  CelestialBody, Gravity, VelocityVerletSim, State, Universe, Simulation, RungeKutta4Sim, ExplicitEulerSim, SemiImplicitEulerSim, CoMTransformation, Vector3
-} from "nbody";
+function CustomComponent() {
+  let simulation = new Simulation(...);
 
-function run(divId, width, height) {
-  let g = 1;
-
-  let force = new Gravity(g);
-  let sim = new VelocityVerletSim(force);
-
-  let a = new CelestialBody(
-    "a",
-    1,
-    new Vector3(-0.97000436, 0.24308753, 0),
-    new Vector3(0.466203685, 0.43236573, 0),
-    new Vector3(0, 0, 0)
-  );
-
-  let b = new CelestialBody(
-    "b",
-    1,
-    new Vector3(0.97000436, -0.24308753, 0),
-    new Vector3(0.466203685, 0.43236573, 0),
-    new Vector3(0, 0, 0)
-  );
-
-  let c = new CelestialBody(
-    "c",
-    1,
-    new Vector3(0, 0, 0),
-    new Vector3(-2 * 0.466203685, -2 * 0.43236573, 0),
-    new Vector3(0, 0, 0)
-  );
-
-  let state = new State([a, b, c]);
-
-  let universe = new Universe({
-    label: "1",
-    currState: state.clone(),
-    color: "rgba(112, 185, 177, 1)",
-    simFunc: sim,
-  });
-
-  let simulation = new Simulation(universe, {
-    visType: "3D",
-    showTrails: true,
-    controller: "ui",
-  });
-
-  simulation.start(divId, 800, 800, width, height);
-}
-
-function App() {
   return (
     <div
       id="demo-canvas"
@@ -85,39 +39,32 @@ function App() {
         height: "800px",
         position: "relative",
       }}
-      ref={() => run("demo-canvas", 800, 800)}
+      ref={() => simulation.start("demo-canvas", 800, 800);}
     ></div>
   );
 }
-
-export default App;
 ```
 
-## Typescript
+### Using useEffect (recommended)
 
-```typescript
-class TranslateZTransformation implements Transformation {
-  transform(state: State, deltaT: number): State {
-    const newState = state.clone();
-    newState.bodies.forEach((body) => {
-      body.position.z += 1;
-    });
-    return newState;
-  }
-}
+```javascript
+function CustomComponent() {
+  useEffect(() => {
+    let simulation = new Simulation(...);
+    simulation.start("demo-canvas", 800, 800);
+    return () => simulation.stop(); // properly cleanup the simulation
+  }, []);
 
-function run(divId: string) {
-  ...
-
-  let universe: Universe = new Universe({
-    label: "Translated Universe",
-    currState: new State([a, b, c]),
-    color: "rgba(254, 209, 106, 1)",
-    simFunc: new VelocityVerletSim(new Gravity(1)),
-    transformations: [new TranslateZTransformation()]
-    }
+  return (
+    <div
+      id="demo-canvas"
+      style={{
+        overflow: "hidden",
+        width: "800px",
+        height: "800px",
+        position: "relative",
+      }}
+    ></div>
   );
-
-  ...
 }
 ```

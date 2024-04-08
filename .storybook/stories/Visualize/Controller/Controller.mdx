@@ -1,0 +1,29 @@
+import { Meta, Story } from '@storybook/blocks';
+
+import * as ControllerStories from "./Controller.stories";
+
+<Meta title="Visualize/Controller" />
+
+## None (default)
+```js
+new Simulation(universe, {
+    controller: 'none'
+})
+```
+<center><Story of={ControllerStories.None} name="None" /></center>
+
+## Ui
+```js
+new Simulation(universe, {
+  controller: 'ui'
+})
+```
+<center><Story of={ControllerStories.Ui} name="Ui" /></center>
+
+## Code
+```js
+new Simulation(universe, {
+    controller: 'code'
+})
+```
+<center><Story of={ControllerStories.Code} name="Code" /></center>

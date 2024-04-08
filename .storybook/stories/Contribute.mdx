@@ -1,0 +1,85 @@
+import { Meta, Story } from "@storybook/blocks";
+
+<Meta title="Contribute" />
+
+# Contribute
+
+**nbody** is maintained by the open-source [Source Academy](https://github.com/source-academy/) development community based in National University of Singapore. Anyone from anywhere is free and welcome to contribute to our project and our community.
+
+  - [Developer Guide](#developer-guide)
+    - [Clone the repository](#clone-the-repository)
+    - [Install packages](#install-packages)
+    - [Developer Setup](#developer-setup)
+    - [Directory Structure](#directory-structure)
+    - [CLI Commands](#cli-commands)
+  - [Roadmap](#roadmap)
+## Developer Guide
+
+Here's a quick guide to get started on contributing to _nbody_.
+
+### Clone the repository
+
+```bash
+git clone https://github.com/source-academy/nbody
+```
+
+### Install packages
+
+We use [Yarn 1](https://classic.yarnpkg.com/lang/en/) as the package manager for its speed and developer experience. This installs all depenedencies required for the development of the project.
+
+```bash
+cd nbody
+yarn install
+```
+
+### Developer Setup
+
+Core libraries used in the project
+- [three](https://threejs.org/) - For 3D rendering
+- [plotly.js](https://plotly.com/javascript/) - For 2D rendering
+- [lil-gui](https://lil-gui.georgealways.com/) - For GUI controls
+
+Development setup of the project
+
+- Source code is written in ES6 format in [Typescript](https://www.typescriptlang.org/)
+- [ESLint](https://eslint.org/) for linting and ensuring code quality. If developing in VSCode, install the ESLint extension for real-time linting and format on save.
+- Code comments in JSdoc format, API documentation generated using [Typedoc](https://typedoc.org/)
+- [Storybook](https://storybook.js.org/) for general documentation and demo showcase
+  - [React](https://react.dev/) and [Vite](https://vitejs.dev/) template for component development
+
+### Directory Structure
+
+- `.storybook`
+  - Contains configuration and components for Storybook documentation
+- `dist`
+  - Contains transpiled code along with type definitions
+- `docs`
+  - Built documentation
+  - `api`
+    - Built API documentation
+- `scripts`
+  - Contains miscellaneous scripts for development like clean
+- `src`
+  - Contains source code
+- package.json
+- tsconfig.json
+
+
+
+### CLI Commands
+
+- **clean** - Clean `dist` (build) and `docs` folders
+- **lint** - Run ESLint on `src` directory to ensure source code adheres to coding standards
+- **docs** - Generate documentation - both Storybook and API reference
+- **docs:api** - Generate only API documentation
+- **docs:storybook** - Generate only Storybook documentation
+- **storybook** - Preview Storybook components
+- **build** - Build the project - lints, cleans, transpiles and generates documentation. Used for deployment.
+- **dev** - Simple build and linking for local development
+- **test** - Run tests
+
+## Roadmap
+
+Contributors are free to pick up any of the following tasks or suggest new features.
+
+- Setup a bundled version of the project for CDN deployment

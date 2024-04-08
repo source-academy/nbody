@@ -100,7 +100,10 @@ declare class ThreeUniverseTrail {
  */
 export declare class RealTimeVisualizer3D implements Visualizer {
     animationId: number | null;
-    renderer: THREE.WebGLRenderer | null;
+    /**
+     * Clear the visualization.
+     */
+    clear: () => void;
     simulation: Simulation;
     scene?: THREE.Scene;
     universeTrails: ThreeUniverseTrail[];
@@ -164,6 +167,10 @@ export declare class RecordingVisualizer implements Visualizer {
  */
 export declare class RecordingVisualizer3D implements Visualizer {
     animationId: number | null;
+    /**
+     * Clear the visualization.
+     */
+    clear: () => void;
     simulation: Simulation;
     scene?: THREE.Scene;
     universeTrails: ThreeUniverseTrail[];
