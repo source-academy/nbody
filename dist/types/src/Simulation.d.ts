@@ -163,11 +163,14 @@ export declare class Simulation {
     /**
      * Insert the simulation visualization in the div with the given id.
      * @param divId div id.
-     * @param speed initial time scale.
-     * @param paused whether to start the simulation paused.
+     * @param width width of the visualization.
+     * @param height height of the visualization.
+     * @param playSpeed initial time scale.
+     * @param startPaused whether to start the simulation paused.
      * @param recordFor number of seconds to record for, only used if in record mode.
+     * @param recordSpeed speed of the recording, only used if in record mode.
      */
-    start(divId: string, width: number, height: number, speed?: number, paused?: boolean, recordFor?: number): void;
+    start(divId: string, width: number, height: number, playSpeed?: number, startPaused?: boolean, recordFor?: number, recordSpeed?: number): void;
     /**
      * Stop and clear the simulation.
      */

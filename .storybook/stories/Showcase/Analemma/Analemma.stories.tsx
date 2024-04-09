@@ -1,35 +1,44 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Simulation } from "../../Simulation";
-import { fig8 } from "../../Universe";
-import { sunEarth } from "./Analemma";
+// import { fig8 } from "../../Universe";
+import { Analemma, sunMars, sunEarth } from "./Analemma";
 
 const meta = {
   title: "Showcase/Analemma",
-  component: Simulation,
+  component: Analemma,
   parameters: {
     layout: "centered",
-    controls: {
-      disable: true,
-    },
   },
   tags: [],
-  argTypes: {},
+  argTypes: {
+    name: {
+      table: {
+        disable: true,
+      },
+    },
+    obj: {
+      table: {
+        disable: true,
+      },
+    },
+  },
   args: {},
-} satisfies Meta<typeof Simulation>;
+} satisfies Meta<typeof Analemma>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const SunEarthAnalemma: Story = {
   args: {
-    storyName: "SunEarthAnalemma",
-    universe: [sunEarth],
-    controller: 'ui',
-    showTrails: true,
-    speed: 5000000,
-    visType: '3D',
-    width: 800,
-    maxTrailLength: 300,
-    showDebugInfo: true,
+    name: "SunEarthAnalemma",
+    obj: sunEarth,
+    axialTilt: sunEarth.actualAxialTilt,
+  },
+};
+
+export const SunMarsAnalemma: Story = {
+  args: {
+    name: "SunMarsAnalemma",
+    obj: sunMars,
+    axialTilt: sunMars.actualAxialTilt,
   },
 };

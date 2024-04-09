@@ -7,13 +7,15 @@ export class CelestialBody {
      * Create a new CelestialBody with the provided information.
      * @param label label of the body.
      * @param mass mass of the body.
+     * @param radius radius of the body.
      * @param position position of the body.
      * @param velocity velocity of the body.
      * @param acceleration acceleration of the body.
      */
-    constructor(label, mass, position, velocity, acceleration) {
+    constructor(label, mass, radius, position, velocity, acceleration) {
         this.label = label;
         this.mass = mass;
+        this.radius = radius;
         this.position = position;
         this.velocity = velocity;
         this.acceleration = acceleration;
@@ -26,6 +28,6 @@ export class CelestialBody {
      * @returns a new CelestialBody instance with the updated properties.
      */
     clone(position, velocity, acceleration) {
-        return new CelestialBody(this.label, this.mass, position === undefined ? this.position.clone() : position, velocity === undefined ? this.velocity.clone() : velocity, acceleration === undefined ? this.acceleration.clone() : acceleration);
+        return new CelestialBody(this.label, this.mass, this.radius, position === undefined ? this.position.clone() : position, velocity === undefined ? this.velocity.clone() : velocity, acceleration === undefined ? this.acceleration.clone() : acceleration);
     }
 }

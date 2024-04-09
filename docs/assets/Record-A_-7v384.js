@@ -1,4 +1,0 @@
-import{j as o}from"./jsx-runtime-DRTy3Uxn.js";import{useMDXComponents as m}from"./index-z5U8iC57.js";import{M as i,d as t}from"./index-iQvBBB1Z.js";import{RealTime as s,Recorded as p,RecordedLooped as a}from"./Record.stories-CIwO-28m.js";import"./index-BBkUAzwr.js";import"./iframe-C3OM9s_A.js";import"../sb-preview/runtime.js";import"./index-PqR-_bA4.js";import"./index-DrlA5mbP.js";import"./index-DrFu-skq.js";import"./Simulation-7H4WISkI.js";import"./Universe-DrO6ncQG.js";function n(r){return o.jsxs(o.Fragment,{children:[o.jsx(i,{title:"Visualize/Record"}),`
-`,o.jsx(t,{of:s,name:"Record"}),`
-`,o.jsx(t,{of:p,name:"Record"}),`
-`,o.jsx(t,{of:a,name:"Record"})]})}function h(r={}){const{wrapper:e}={...m(),...r.components};return e?o.jsx(e,{...r,children:o.jsx(n,{...r})}):n()}export{h as default};

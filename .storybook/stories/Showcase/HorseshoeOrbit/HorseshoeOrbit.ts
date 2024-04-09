@@ -1,9 +1,10 @@
-import { BodyCenterTransformation, CelestialBody, CoMTransformation, PinTransformation, RotateTransformation, RungeKutta4Sim, State, TimedRotateTransformation, Universe, Vector3 } from "../../../../src";
+import { CelestialBody, CoMTransformation, PinTransformation, RotateTransformation, RungeKutta4Sim, State, Universe, Vector3 } from "../../../../src";
 
 const yorpState = new State([
   new CelestialBody(
     "Sun",
     1988500e24,
+  696340e3,
     new Vector3(0, 0, 0),
     new Vector3(0, 0, 0),
     new Vector3(0, 0, 0)
@@ -11,6 +12,7 @@ const yorpState = new State([
   new CelestialBody(
     "Earth",
     5.97219e24,
+      6371e3,
     new Vector3(
       -2.48109932596539e10,
       1.449948612736719e11,
@@ -25,6 +27,7 @@ const yorpState = new State([
   ),
   new CelestialBody(
     "YORP",
+    1,
     1,
     new Vector3(
       1.789598196203594e11,
