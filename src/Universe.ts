@@ -74,9 +74,7 @@ export class Universe {
     this.transformations
       = config.transformations === undefined
         ? []
-        : Array.isArray(config.transformations)
-          ? config.transformations
-          : [config.transformations];
+        : config.transformations;
   }
 
   /**

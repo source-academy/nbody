@@ -115,7 +115,7 @@ export class Simulation {
         if (this.controller === 'code') {
             this.controls.showTrails = showTrails;
             if (!showTrails) {
-                // TODO
+                this.visualizer.clearTrails();
             }
         }
     }
@@ -133,8 +133,17 @@ export class Simulation {
      * @param show true to show the universe.
      */
     setShowUniverse(label, show) {
-        if (this.controller === 'code') {
-            this.controls.showUniverse[label] = show;
+        if (this.controller !== 'code') {
+            return;
+        }
+        for (let i = 0; i < this.universes.length; i++) {
+            if (this.universes[i].label === label) {
+                this.controls.showUniverse[label] = show;
+                if (!show) {
+                    this.visualizer.clearTrails(i);
+                }
+                break;
+            }
         }
     }
     /**

@@ -1,6 +1,6 @@
 {
   "name": "nbody",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Configure, simulate and visualize n-body interactions",
   "main": "./dist/src/index.js",
   "types": "./dist/types/src/index.d.ts",

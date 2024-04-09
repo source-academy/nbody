@@ -1,4 +1,4 @@
-import { type Vector3 } from 'three';
+import { Vector3 } from 'three';
 /**
  * Represents a celestial body with all of its kinematic properties.
  * @category Building blocks
@@ -37,7 +37,7 @@ export declare class CelestialBody {
      * @param velocity velocity of the body.
      * @param acceleration acceleration of the body.
      */
-    constructor(label: string, mass: number, radius: number, position: Vector3, velocity: Vector3, acceleration: Vector3);
+    constructor(label: string, mass: number, radius?: number, position?: Vector3, velocity?: Vector3, acceleration?: Vector3);
     /**
      * Deep copy the current CelestialBody with the updated kinematic properties.
      * @param position new position.

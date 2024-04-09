@@ -41,6 +41,7 @@ export const Code: Story = {
     storyName: 'Code',
     universe: [fig8],
     controller: 'code',
+    showTrails: true,
     callback: (sim) => {
       const id = setInterval(() => {
         sim.setShowUniverse(fig8.label, !sim.getShowUniverse(fig8.label));

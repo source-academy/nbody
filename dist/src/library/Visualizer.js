@@ -293,6 +293,18 @@ export class RealTimeVisualizer {
         this.animationId = requestAnimationFrame(paint);
     }
     /**
+     * Clear all trails in the visualization.
+     * @param i index of the universe to clear trails for.
+     */
+    clearTrails(i) {
+        if (i === undefined) {
+            this.universeTrails.forEach((ut) => ut.popAllTrails());
+        }
+        else {
+            this.universeTrails[i].popAllTrails();
+        }
+    }
+    /**
      * Stop the simulation and visualization.
      */
     stop() {
@@ -301,10 +313,6 @@ export class RealTimeVisualizer {
             return;
         }
         cancelAnimationFrame(this.animationId);
-        this.divId = '';
-        this.universeTrails.forEach((ut) => {
-            ut.popAllTrails();
-        });
         this.universeTrails = [];
         this.removeControls();
         (_a = this.stats) === null || _a === void 0 ? void 0 : _a.dom.remove();
@@ -613,6 +621,18 @@ export class RealTimeVisualizer3D {
         this.animationId = requestAnimationFrame(paint);
     }
     /**
+     * Clear all trails in the visualization.
+     * @param i index of the universe to clear trails for.
+     */
+    clearTrails(i) {
+        if (i === undefined) {
+            this.universeTrails.forEach((ut) => ut.popAllTrails());
+        }
+        else {
+            this.universeTrails[i].popAllTrails();
+        }
+    }
+    /**
      * Stop the simulation and visualization.
      */
     stop() {
@@ -870,6 +890,18 @@ export class RecordingVisualizer {
             this.animationId = requestAnimationFrame(paint);
         };
         this.animationId = requestAnimationFrame(paint);
+    }
+    /**
+     * Clear all trails in the visualization.
+     * @param i index of the universe to clear trails for.
+     */
+    clearTrails(i) {
+        if (i === undefined) {
+            this.universeTrails.forEach((ut) => ut.popAllTrails());
+        }
+        else {
+            this.universeTrails[i].popAllTrails();
+        }
     }
     /**
      * Stop the simulation and visualization.
@@ -1140,6 +1172,18 @@ export class RecordingVisualizer3D {
             });
         };
         this.animationId = requestAnimationFrame(paint);
+    }
+    /**
+     * Clear all trails in the visualization.
+     * @param i index of the universe to clear trails for.
+     */
+    clearTrails(i) {
+        if (i === undefined) {
+            this.universeTrails.forEach((ut) => ut.popAllTrails());
+        }
+        else {
+            this.universeTrails[i].popAllTrails();
+        }
     }
     /**
      * Stop the simulation and visualization.
