@@ -69,6 +69,11 @@ export declare class RealTimeVisualizer implements Visualizer {
      */
     start(divId: string, width: number, height: number): void;
     /**
+     * Clear all trails in the visualization.
+     * @param i index of the universe to clear trails for.
+     */
+    clearTrails(i?: number): void;
+    /**
      * Stop the simulation and visualization.
      */
     stop(): void;
@@ -139,6 +144,11 @@ export declare class RealTimeVisualizer3D implements Visualizer {
      */
     start(divId: string, width: number, height: number): void;
     /**
+     * Clear all trails in the visualization.
+     * @param i index of the universe to clear trails for.
+     */
+    clearTrails(i?: number): void;
+    /**
      * Stop the simulation and visualization.
      */
     stop(): void;
@@ -177,6 +187,11 @@ export declare class RecordingVisualizer implements Visualizer {
      * @param recordSpeed speed to record the visualization at.
      */
     start(divId: string, width: number, height: number, recordFor: number, recordSpeed: number): void;
+    /**
+     * Clear all trails in the visualization.
+     * @param i index of the universe to clear trails for.
+     */
+    clearTrails(i?: number): void;
     /**
      * Stop the simulation and visualization.
      */
@@ -220,6 +235,11 @@ export declare class RecordingVisualizer3D implements Visualizer {
      * @param recordSpeed speed to record the simulation at.
      */
     start(divId: string, width: number, height: number, recordFor: number, recordSpeed: number): void;
+    /**
+     * Clear all trails in the visualization.
+     * @param i index of the universe to clear trails for.
+     */
+    clearTrails(i?: number): void;
     /**
      * Stop the simulation and visualization.
      */

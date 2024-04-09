@@ -1,3 +1,4 @@
+import { Vector3 } from 'three';
 /**
  * Represents a celestial body with all of its kinematic properties.
  * @category Building blocks
@@ -12,7 +13,7 @@ export class CelestialBody {
      * @param velocity velocity of the body.
      * @param acceleration acceleration of the body.
      */
-    constructor(label, mass, radius, position, velocity, acceleration) {
+    constructor(label, mass, radius = 1, position = new Vector3(), velocity = new Vector3(), acceleration = new Vector3()) {
         this.label = label;
         this.mass = mass;
         this.radius = radius;

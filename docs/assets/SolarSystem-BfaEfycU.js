@@ -1,4 +1,0 @@
-import{j as t}from"./jsx-runtime-DRTy3Uxn.js";import{useMDXComponents as n}from"./index-z5U8iC57.js";import{M as m,d as s}from"./index-BLJ7OnYF.js";import{SolarSystem as i}from"./SolarSystem.stories-CKTAJpEs.js";import"./index-BBkUAzwr.js";import"./iframe-5rd2FdmP.js";import"../sb-preview/runtime.js";import"./index-PqR-_bA4.js";import"./index-DrlA5mbP.js";import"./index-DrFu-skq.js";import"./Simulation-ChslY3aX.js";import"./Universe-PJ2jYdc8.js";import"./Universe-BHXwzv85.js";function r(o){const e={code:"code",h2:"h2",pre:"pre",...n(),...o.components};return t.jsxs(t.Fragment,{children:[t.jsx(m,{title:"Showcase/SolarSystem"}),`
-`,t.jsx(e.h2,{id:""}),`
-`,t.jsx(e.pre,{children:t.jsx(e.code,{className:"language-js"})}),`
-`,t.jsx("center",{children:t.jsx(s,{of:i,name:""})})]})}function g(o={}){const{wrapper:e}={...n(),...o.components};return e?t.jsx(e,{...o,children:t.jsx(r,{...o})}):r(o)}export{g as default};

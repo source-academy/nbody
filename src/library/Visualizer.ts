@@ -364,6 +364,18 @@ export class RealTimeVisualizer implements Visualizer {
   }
 
   /**
+   * Clear all trails in the visualization.
+   * @param i index of the universe to clear trails for.
+   */
+  clearTrails(i?: number): void {
+    if (i === undefined) {
+      this.universeTrails.forEach((ut) => ut.popAllTrails());
+    } else {
+      this.universeTrails[i].popAllTrails();
+    }
+  }
+
+  /**
    * Stop the simulation and visualization.
    */
   stop(): void {
@@ -371,10 +383,6 @@ export class RealTimeVisualizer implements Visualizer {
       return;
     }
     cancelAnimationFrame(this.animationId);
-    this.divId = '';
-    this.universeTrails.forEach((ut) => {
-      ut.popAllTrails();
-    });
     this.universeTrails = [];
     this.removeControls();
     this.stats?.dom.remove();
@@ -772,6 +780,18 @@ export class RealTimeVisualizer3D implements Visualizer {
   }
 
   /**
+   * Clear all trails in the visualization.
+   * @param i index of the universe to clear trails for.
+   */
+  clearTrails(i?: number): void {
+    if (i === undefined) {
+      this.universeTrails.forEach((ut) => ut.popAllTrails());
+    } else {
+      this.universeTrails[i].popAllTrails();
+    }
+  }
+
+  /**
    * Stop the simulation and visualization.
    */
   stop(): void {
@@ -1067,6 +1087,18 @@ export class RecordingVisualizer implements Visualizer {
     };
 
     this.animationId = requestAnimationFrame(paint);
+  }
+
+  /**
+   * Clear all trails in the visualization.
+   * @param i index of the universe to clear trails for.
+   */
+  clearTrails(i?: number): void {
+    if (i === undefined) {
+      this.universeTrails.forEach((ut) => ut.popAllTrails());
+    } else {
+      this.universeTrails[i].popAllTrails();
+    }
   }
 
   /**
@@ -1389,6 +1421,18 @@ export class RecordingVisualizer3D implements Visualizer {
       });
     };
     this.animationId = requestAnimationFrame(paint);
+  }
+
+  /**
+   * Clear all trails in the visualization.
+   * @param i index of the universe to clear trails for.
+   */
+  clearTrails(i?: number): void {
+    if (i === undefined) {
+      this.universeTrails.forEach((ut) => ut.popAllTrails());
+    } else {
+      this.universeTrails[i].popAllTrails();
+    }
   }
 
   /**

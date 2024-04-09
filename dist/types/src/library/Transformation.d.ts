@@ -11,7 +11,7 @@ export declare class BodyCenterTransformation implements Transformation {
      * Create a new BodyCenterTransformer.
      * @param index index of the body to transform to.
      */
-    constructor(index: number);
+    constructor(index?: number);
     /**
      * Transform the frame of reference to the center of the first body in the system.
      * @param state state to transform.
@@ -62,7 +62,7 @@ export declare class PinTransformation implements Transformation {
      * @param axis axis to pin to.
      * @param index index of the body to pin.
      */
-    constructor(axis: Vector3, index: number);
+    constructor(axis: Vector3, index?: number);
     /**
      * Transform the frame of reference to a pin body i to the given axis.
      * @param state state to transform.

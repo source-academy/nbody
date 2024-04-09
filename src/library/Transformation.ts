@@ -13,7 +13,7 @@ export class BodyCenterTransformation implements Transformation {
    * Create a new BodyCenterTransformer.
    * @param index index of the body to transform to.
    */
-  constructor(index: number) {
+  constructor(index: number = 0) {
     this.index = index;
   }
 
@@ -102,7 +102,7 @@ export class PinTransformation implements Transformation {
    * @param axis axis to pin to.
    * @param index index of the body to pin.
    */
-  constructor(axis: Vector3, index: number) {
+  constructor(axis: Vector3, index: number = 0) {
     this.axis = axis;
     this.index = index;
   }

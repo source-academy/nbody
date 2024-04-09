@@ -1,4 +1,4 @@
-import { type Vector3 } from 'three';
+import { Vector3 } from 'three';
 
 /**
  * Represents a celestial body with all of its kinematic properties.
@@ -42,10 +42,10 @@ export class CelestialBody {
   constructor(
     label: string,
     mass: number,
-    radius: number,
-    position: Vector3,
-    velocity: Vector3,
-    acceleration: Vector3,
+    radius: number = 1,
+    position: Vector3 = new Vector3(),
+    velocity: Vector3 = new Vector3(),
+    acceleration: Vector3 = new Vector3(),
   ) {
     this.label = label;
     this.mass = mass;
