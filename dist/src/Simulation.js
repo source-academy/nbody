@@ -23,7 +23,7 @@ export class Simulation {
          */
         this.controls = {
             speed: 1,
-            paused: true,
+            paused: false,
             showTrails: false,
             showUniverse: {},
         };
@@ -166,17 +166,20 @@ export class Simulation {
     /**
      * Insert the simulation visualization in the div with the given id.
      * @param divId div id.
-     * @param speed initial time scale.
-     * @param paused whether to start the simulation paused.
+     * @param width width of the visualization.
+     * @param height height of the visualization.
+     * @param playSpeed initial time scale.
+     * @param startPaused whether to start the simulation paused.
      * @param recordFor number of seconds to record for, only used if in record mode.
+     * @param recordSpeed speed of the recording, only used if in record mode.
      */
-    start(divId, width, height, speed = 1, paused = false, recordFor = 0) {
+    start(divId, width, height, playSpeed = 1, startPaused = false, recordFor = 1, recordSpeed = 1) {
         if (recordFor === undefined) {
             throw new Error('recordFor must be defined if record is true');
         }
-        this.controls.paused = paused;
-        this.controls.speed = speed;
-        this.visualizer.start(divId, width, height, recordFor);
+        this.controls.paused = startPaused;
+        this.controls.speed = playSpeed;
+        this.visualizer.start(divId, width, height, recordFor, recordSpeed);
     }
     /**
      * Stop and clear the simulation.

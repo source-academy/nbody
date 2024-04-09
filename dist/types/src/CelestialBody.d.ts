@@ -13,6 +13,10 @@ export declare class CelestialBody {
      */
     readonly mass: number;
     /**
+     * Mean mass of the body.
+     */
+    readonly radius: number;
+    /**
      * Position vector of the body.
      */
     position: Vector3;
@@ -28,11 +32,12 @@ export declare class CelestialBody {
      * Create a new CelestialBody with the provided information.
      * @param label label of the body.
      * @param mass mass of the body.
+     * @param radius radius of the body.
      * @param position position of the body.
      * @param velocity velocity of the body.
      * @param acceleration acceleration of the body.
      */
-    constructor(label: string, mass: number, position: Vector3, velocity: Vector3, acceleration: Vector3);
+    constructor(label: string, mass: number, radius: number, position: Vector3, velocity: Vector3, acceleration: Vector3);
     /**
      * Deep copy the current CelestialBody with the updated kinematic properties.
      * @param position new position.

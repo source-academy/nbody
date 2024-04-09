@@ -14,6 +14,10 @@ export class CelestialBody {
    */
   readonly mass: number; // mean mass
   /**
+   * Mean mass of the body.
+   */
+  readonly radius: number; // mean radius
+  /**
    * Position vector of the body.
    */
   position: Vector3;
@@ -30,6 +34,7 @@ export class CelestialBody {
    * Create a new CelestialBody with the provided information.
    * @param label label of the body.
    * @param mass mass of the body.
+   * @param radius radius of the body.
    * @param position position of the body.
    * @param velocity velocity of the body.
    * @param acceleration acceleration of the body.
@@ -37,12 +42,14 @@ export class CelestialBody {
   constructor(
     label: string,
     mass: number,
+    radius: number,
     position: Vector3,
     velocity: Vector3,
     acceleration: Vector3,
   ) {
     this.label = label;
     this.mass = mass;
+    this.radius = radius;
     this.position = position;
     this.velocity = velocity;
     this.acceleration = acceleration;
@@ -61,6 +68,7 @@ export class CelestialBody {
     return new CelestialBody(
       this.label,
       this.mass,
+      this.radius,
       position === undefined ? this.position.clone() : position,
       velocity === undefined ? this.velocity.clone() : velocity,
       acceleration === undefined ? this.acceleration.clone() : acceleration,

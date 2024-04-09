@@ -10,8 +10,9 @@ export interface Visualizer {
    * @param width width of the visualizer.
    * @param height height of the visualizer.
    * @param recordFor time to record the visualization for.
+   * @param recordSpeed speed to record the visualization at.
    */
-  start(divId: string, width: number, height: number, recordFor: number): void;
+  start(divId: string, width: number, height: number, recordFor: number, recordSpeed: number): void;
 
   /**
    * Stop and clear the visualization.

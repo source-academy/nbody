@@ -17,6 +17,7 @@ export const fig8 = new Universe({
     new CelestialBody(
       "Body 1",
       1,
+      1,
       new Vector3(-0.97000436, 0.24308753, 0),
       new Vector3(0.466203685, 0.43236573, 0),
       new Vector3(0, 0, 0)
@@ -24,12 +25,14 @@ export const fig8 = new Universe({
     new CelestialBody(
       "Body 2",
       1,
+      1,
       new Vector3(0.97000436, -0.24308753, 0),
       new Vector3(0.466203685, 0.43236573, 0),
       new Vector3(0, 0, 0)
     ),
     new CelestialBody(
       "Body 3",
+      1,
       1,
       new Vector3(0, 0, 0),
       new Vector3(-2 * 0.466203685, -2 * 0.43236573, 0),
@@ -47,6 +50,7 @@ export const multiFig8 = [
       new CelestialBody(
         "Body 1",
         1,
+        1,
         new Vector3(-0.97000436, 0.24308753, 0),
         new Vector3(0.466203685, 0.43236573, 0),
         new Vector3(0, 0, 0)
@@ -54,12 +58,14 @@ export const multiFig8 = [
       new CelestialBody(
         "Body 2",
         1,
+        1,
         new Vector3(0.97000436, -0.24308753, 0),
         new Vector3(0.466203685, 0.43236573, 0),
         new Vector3(0, 0, 0)
       ),
       new CelestialBody(
         "Body 3",
+        1,
         1,
         new Vector3(0, 0, 0),
         new Vector3(-2 * 0.466203685, -2 * 0.43236573, 0),

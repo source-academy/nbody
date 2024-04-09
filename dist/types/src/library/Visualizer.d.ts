@@ -1,3 +1,5 @@
+import GUI from 'lil-gui';
+import Stats from 'stats.js';
 import * as THREE from 'three';
 import { type Simulation } from '../Simulation';
 import { type Visualizer } from '../Visualizer';
@@ -43,6 +45,8 @@ export declare class RealTimeVisualizer implements Visualizer {
     simulation: Simulation;
     divId: string;
     universeTrails: PlotlyUniverseTrail[];
+    gui?: GUI;
+    stats?: Stats;
     /**
      * Constructor for RealTimeVisualizer
      * @param simulation simulation object
@@ -53,6 +57,10 @@ export declare class RealTimeVisualizer implements Visualizer {
      * @param parentElement parent element to place the controller div in.
      */
     private addControls;
+    /**
+     * Remove the controls from the visualization.
+     */
+    private removeControls;
     /**
      * Simulate and play the visualization.
      * @param divId div id to render the visualization in.
@@ -107,6 +115,8 @@ export declare class RealTimeVisualizer3D implements Visualizer {
     simulation: Simulation;
     scene?: THREE.Scene;
     universeTrails: ThreeUniverseTrail[];
+    gui?: GUI;
+    stats?: Stats;
     /**
      * Constructor for RealTimeVisualizer3D.
      * @param simulation simulation object.
@@ -117,6 +127,10 @@ export declare class RealTimeVisualizer3D implements Visualizer {
      * @param parentElement parent element to place the controller div in.
      */
     private addControls;
+    /**
+     * Remove the controls from the visualization.
+     */
+    private removeControls;
     /**
      * Simulate and play the visualization
      * @param divId div id to render the visualization in
@@ -138,6 +152,8 @@ export declare class RecordingVisualizer implements Visualizer {
     simulation: Simulation;
     divId: string;
     universeTrails: PlotlyUniverseTrail[];
+    gui?: GUI;
+    stats?: Stats;
     /**
      * Constructor for RealTimeVisualizer
      * @param simulation simulation object
@@ -149,13 +165,18 @@ export declare class RecordingVisualizer implements Visualizer {
      */
     private addControls;
     /**
+     * Remove the controls from the visualization.
+     */
+    removeControls(): void;
+    /**
      * Simulate and play the visualization.
      * @param divId div id to render the visualization in.
      * @param width width of the visualization.
      * @param height height of the visualization.
-     * @param recordFor number of seconds to record for..
+     * @param recordFor number of seconds to record for.
+     * @param recordSpeed speed to record the visualization at.
      */
-    start(divId: string, width: number, height: number, recordFor: number): void;
+    start(divId: string, width: number, height: number, recordFor: number, recordSpeed: number): void;
     /**
      * Stop the simulation and visualization.
      */
@@ -174,6 +195,8 @@ export declare class RecordingVisualizer3D implements Visualizer {
     simulation: Simulation;
     scene?: THREE.Scene;
     universeTrails: ThreeUniverseTrail[];
+    gui?: GUI;
+    stats?: Stats;
     /**
      * Constructor for RealTimeVisualizer3D.
      * @param simulation simulation object.
@@ -185,13 +208,18 @@ export declare class RecordingVisualizer3D implements Visualizer {
      */
     private addControls;
     /**
+     * Remove the controls from the visualization.
+     */
+    private removeControls;
+    /**
      * Simulate and play the visualization
      * @param divId div id to render the visualization in.
      * @param width width of the visualization.
      * @param height height of the visualization.
      * @param recordFor number of seconds to record for.
+     * @param recordSpeed speed to record the simulation at.
      */
-    start(divId: string, width: number, height: number, recordFor: number): void;
+    start(divId: string, width: number, height: number, recordFor: number, recordSpeed: number): void;
     /**
      * Stop the simulation and visualization.
      */

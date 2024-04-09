@@ -1,22 +1,22 @@
 /* eslint-disable import/extensions */
 import GUI from 'lil-gui';
 import Plotly from 'plotly.js-dist';
+import Stats from 'stats.js';
 import * as THREE from 'three';
 import { OrbitControls, ViewHelper } from 'three/examples/jsm/Addons.js';
-import Stats from 'three/examples/jsm/libs/stats.module.js';
 /**
- * Clips a number to a minimum and maximum value.
- * @param x number to clip.
- * @param min minimum value.
- * @param max maximum value.
- * @returns clipped value.
+ * Extrapolates a value from a range to another range.
+ * @param val value to extrapolate.
+ * @param minR minimum value of the input range.
+ * @param maxR maximum value of the input range.
+ * @param low minimum value of the output range.
+ * @param high maximum value of the output range.
+ * @returns extrapolated value.
  */
-function clipMinMax(x, min, max) {
-    if (x < min)
-        return min;
-    if (x > max)
-        return max;
-    return x;
+function extrapolateRadius(val, minR, maxR, low, high) {
+    if (minR === maxR)
+        return (low + high) / 2;
+    return low + ((val - minR) / (maxR - minR)) * (high - low);
 }
 /**
  * Container object for body trails in a 2D universe based in Plotly.
@@ -117,6 +117,14 @@ export class RealTimeVisualizer {
                 config.showUniverse[u.label] = value;
             });
         });
+        this.gui = gui;
+    }
+    /**
+     * Remove the controls from the visualization.
+     */
+    removeControls() {
+        var _a;
+        (_a = this.gui) === null || _a === void 0 ? void 0 : _a.destroy();
     }
     /**
      * Simulate and play the visualization.
@@ -138,11 +146,17 @@ export class RealTimeVisualizer {
         // const height = element.clientHeight;
         let maxWidth = 0;
         let maxHeight = 0;
+        let maxRadius = 0;
+        let minRadius = Infinity;
         this.simulation.universes.forEach((u) => u.currState.bodies.forEach((b) => {
             maxWidth = Math.max(maxWidth, Math.abs(b.position.x));
             maxHeight = Math.max(maxHeight, Math.abs(b.position.y));
+            minRadius = Math.min(minRadius, b.radius);
+            maxRadius = Math.max(maxRadius, b.radius);
         }));
         const scale = 0.5 * Math.min(height / maxHeight, width / maxWidth);
+        const minShowRadius = 0.01 * Math.min(height, width);
+        const maxShowRadius = 0.05 * Math.min(height, width);
         const layout = {
             paper_bgcolor: '#000000',
             plot_bgcolor: '#000000',
@@ -165,13 +179,12 @@ export class RealTimeVisualizer {
         if (this.simulation.controller === 'ui') {
             this.addControls(element);
         }
-        let stats;
         if (this.simulation.showDebugInfo) {
-            stats = new Stats();
-            stats.dom.style.position = 'absolute';
-            stats.dom.style.bottom = '0px';
-            stats.dom.style.removeProperty('top');
-            element.appendChild(stats.dom);
+            this.stats = new Stats();
+            this.stats.dom.style.position = 'absolute';
+            this.stats.dom.style.bottom = '0px';
+            this.stats.dom.style.removeProperty('top');
+            element.appendChild(this.stats.dom);
         }
         const init_data = this.simulation.universes.flatMap((uni) => {
             const currTrail = new PlotlyUniverseTrail(this.simulation.getMaxTrailLength(), typeof uni.color === 'string' ? uni.color : uni.color[0]);
@@ -183,8 +196,8 @@ export class RealTimeVisualizer {
                 mode: 'markers',
                 marker: {
                     color: uni.color,
-                    sizemin: 6,
-                    size: uni.currState.bodies.map((body) => Math.min(10, body.mass)),
+                    sizemin: minShowRadius,
+                    size: uni.currState.bodies.map((body) => extrapolateRadius(body.radius, minRadius, maxRadius, minShowRadius, maxShowRadius)),
                 },
             };
             if (this.simulation.getShowTrails()) {
@@ -255,9 +268,9 @@ export class RealTimeVisualizer {
                     y: uni.currState.bodies.map((body) => body.position.y),
                     hovertext: uni.currState.bodies.map((body) => body.label),
                     marker: {
-                        size: uni.currState.bodies.map((body) => Math.min(10, body.mass)),
                         color: uni.color,
-                        sizemin: 6,
+                        sizemin: minShowRadius,
+                        size: uni.currState.bodies.map((body) => extrapolateRadius(body.radius, minRadius, maxRadius, minShowRadius, maxShowRadius)),
                     },
                     mode: 'markers',
                 };
@@ -272,8 +285,8 @@ export class RealTimeVisualizer {
                 return [currData, trailData];
             });
             Plotly.react(divId, new_data, layout);
-            if (this.simulation.showDebugInfo && stats) {
-                stats.update();
+            if (this.simulation.showDebugInfo && this.stats) {
+                this.stats.update();
             }
             this.animationId = requestAnimationFrame(paint);
         };
@@ -283,6 +296,7 @@ export class RealTimeVisualizer {
      * Stop the simulation and visualization.
      */
     stop() {
+        var _a;
         if (this.animationId === null) {
             return;
         }
@@ -292,6 +306,8 @@ export class RealTimeVisualizer {
             ut.popAllTrails();
         });
         this.universeTrails = [];
+        this.removeControls();
+        (_a = this.stats) === null || _a === void 0 ? void 0 : _a.dom.remove();
         try {
             Plotly.purge(this.divId);
         }
@@ -405,6 +421,14 @@ export class RealTimeVisualizer3D {
                 config.showUniverse[u.label] = value;
             });
         });
+        this.gui = gui;
+    }
+    /**
+     * Remove the controls from the visualization.
+     */
+    removeControls() {
+        var _a;
+        (_a = this.gui) === null || _a === void 0 ? void 0 : _a.destroy();
     }
     /**
      * Simulate and play the visualization
@@ -422,15 +446,19 @@ export class RealTimeVisualizer3D {
             return;
         }
         element.style.position = 'relative';
-        // const width = element.clientWidth;
-        // const height = element.clientHeight;
-        let maxWidth = 0;
-        let maxHeight = 0;
+        let maxLength = 0;
+        let maxRadius = 0;
+        let minRadius = Infinity;
         this.simulation.universes.forEach((u) => u.currState.bodies.forEach((b) => {
-            maxWidth = Math.max(maxWidth, Math.abs(b.position.x));
-            maxHeight = Math.max(maxHeight, Math.abs(b.position.y));
+            for (let i = 0; i < 3; i++) {
+                maxLength = Math.max(maxLength, Math.abs(b.position.getComponent(i)));
+            }
+            minRadius = Math.min(minRadius, b.radius);
+            maxRadius = Math.max(maxRadius, b.radius);
         }));
-        const scale = 0.5 * Math.min(height / maxHeight, width / maxWidth);
+        const scale = 0.5 * Math.min(height, width) / maxLength;
+        const minShowRadius = 0.015 * Math.min(height, width);
+        const maxShowRadius = 0.04 * Math.min(height, width);
         this.scene = new THREE.Scene();
         const camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, 0, 10000000000);
         camera.position.set(0, 0, Math.max(width, height));
@@ -438,13 +466,12 @@ export class RealTimeVisualizer3D {
         renderer.setSize(width, height);
         renderer.autoClear = false;
         element.appendChild(renderer.domElement);
-        let stats;
         if (this.simulation.showDebugInfo) {
-            stats = new Stats();
-            stats.dom.style.position = 'absolute';
-            stats.dom.style.right = '0px';
-            stats.dom.style.removeProperty('left');
-            element.appendChild(stats.dom);
+            this.stats = new Stats();
+            this.stats.dom.style.position = 'absolute';
+            this.stats.dom.style.right = '0px';
+            this.stats.dom.style.removeProperty('left');
+            element.appendChild(this.stats.dom);
         }
         if (this.simulation.controller === 'ui') {
             this.addControls(element);
@@ -477,16 +504,24 @@ export class RealTimeVisualizer3D {
         this.simulation.universes.forEach((u) => {
             this.universeTrails.push(new ThreeUniverseTrail(this.simulation.maxTrailLength, typeof u.color === 'string' ? u.color : u.color[0], this.scene, scale));
             u.currState.bodies.forEach((b, i) => {
-                const sph = new THREE.SphereGeometry(clipMinMax(Math.log2(b.mass) - 70, 10, 40), 8, 8);
-                const curr = new THREE.WireframeGeometry(sph);
-                const line = new THREE.LineSegments(curr, new THREE.LineBasicMaterial({
+                const sph = new THREE.SphereGeometry(extrapolateRadius(b.radius, minRadius, maxRadius, minShowRadius, maxShowRadius), 12, 12);
+                const group = new THREE.Group();
+                group.add(new THREE.LineSegments(new THREE.WireframeGeometry(sph), new THREE.LineBasicMaterial({
                     color: new THREE.Color(typeof u.color === 'string' ? u.color : u.color[i]),
-                }));
-                this.scene.add(line);
-                line.position.copy(b.position.clone()
+                    transparent: true,
+                    opacity: 0.4,
+                })));
+                group.add(new THREE.Mesh(sph, new THREE.MeshBasicMaterial({
+                    color: new THREE.Color(typeof u.color === 'string' ? u.color : u.color[i]),
+                    transparent: true,
+                    opacity: 0.5,
+                    side: THREE.FrontSide,
+                })));
+                this.scene.add(group);
+                group.position.copy(b.position.clone()
                     .multiplyScalar(scale));
                 // m.set(u.label + " " + b.label, line);
-                arr.push(line);
+                arr.push(group);
             });
         });
         // arr[0].add(earthLabel)
@@ -529,8 +564,8 @@ export class RealTimeVisualizer3D {
                 return;
             }
             lastPaint = timestampMs;
-            if (this.simulation.showDebugInfo && stats) {
-                stats.update();
+            if (this.simulation.showDebugInfo && this.stats) {
+                this.stats.update();
             }
             let ind = 0;
             this.simulation.universes.forEach((u, i) => {
@@ -540,7 +575,7 @@ export class RealTimeVisualizer3D {
                         arr[ind].position.copy(b.position.clone()
                             .multiplyScalar(scale));
                         if (this.simulation.controls.showTrails) {
-                            this.universeTrails[i].addTrail(arr[ind].position);
+                            this.universeTrails[i].addTrail(arr[ind].position.clone());
                         }
                         ind++;
                     });
@@ -565,17 +600,15 @@ export class RealTimeVisualizer3D {
         this.clear = () => {
             renderer.clear();
             renderer.dispose();
-            arr.forEach((a) => {
-                if (Array.isArray(a.material)) {
-                    a.material.forEach((m) => {
-                        m.dispose();
-                    });
-                }
-                else {
-                    a.material.dispose();
-                }
-                a.geometry.dispose();
+            arr.forEach((g) => {
+                g.children.forEach((c) => {
+                    // @ts-ignore
+                    c.geometry.dispose();
+                    // @ts-ignore
+                    c.material.dispose();
+                });
             });
+            renderer.domElement.remove();
         };
         this.animationId = requestAnimationFrame(paint);
     }
@@ -583,7 +616,7 @@ export class RealTimeVisualizer3D {
      * Stop the simulation and visualization.
      */
     stop() {
-        var _a;
+        var _a, _b;
         if (this.animationId === null) {
             return;
         }
@@ -599,6 +632,8 @@ export class RealTimeVisualizer3D {
             ut.popAllTrails();
         });
         this.universeTrails = [];
+        this.removeControls();
+        (_b = this.stats) === null || _b === void 0 ? void 0 : _b.dom.remove();
     }
 }
 /**
@@ -649,15 +684,24 @@ export class RecordingVisualizer {
                 config.showUniverse[u.label] = value;
             });
         });
+        this.gui = gui;
+    }
+    /**
+     * Remove the controls from the visualization.
+     */
+    removeControls() {
+        var _a;
+        (_a = this.gui) === null || _a === void 0 ? void 0 : _a.destroy();
     }
     /**
      * Simulate and play the visualization.
      * @param divId div id to render the visualization in.
      * @param width width of the visualization.
      * @param height height of the visualization.
-     * @param recordFor number of seconds to record for..
+     * @param recordFor number of seconds to record for.
+     * @param recordSpeed speed to record the visualization at.
      */
-    start(divId, width, height, recordFor) {
+    start(divId, width, height, recordFor, recordSpeed) {
         if (this.divId !== '') {
             console.error('Simulation already playing. Stop the current playtime before initiating a new one.');
             return;
@@ -667,15 +711,19 @@ export class RecordingVisualizer {
         if (element === null) {
             return;
         }
-        // const width = element.clientWidth;
-        // const height = element.clientHeight;
         let maxWidth = 0;
         let maxHeight = 0;
+        let maxRadius = 0;
+        let minRadius = Infinity;
         this.simulation.universes.forEach((u) => u.currState.bodies.forEach((b) => {
             maxWidth = Math.max(maxWidth, Math.abs(b.position.x));
             maxHeight = Math.max(maxHeight, Math.abs(b.position.y));
+            minRadius = Math.min(minRadius, b.radius);
+            maxRadius = Math.max(maxRadius, b.radius);
         }));
         const scale = 0.5 * Math.min(height / maxHeight, width / maxWidth);
+        const minShowRadius = 0.01 * Math.min(height, width);
+        const maxShowRadius = 0.05 * Math.min(height, width);
         const recordedFrames = [];
         const totalFrames = this.simulation.maxFrameRate * recordFor;
         let playInd = 1;
@@ -683,7 +731,7 @@ export class RecordingVisualizer {
             recordedFrames.push([u.currState.clone()]);
         });
         for (let i = 0; i < totalFrames; i++) {
-            this.simulation.simulateStep(1 / this.simulation.maxFrameRate);
+            this.simulation.simulateStep(recordSpeed / this.simulation.maxFrameRate);
             this.simulation.universes.forEach((u, j) => {
                 recordedFrames[j].push(u.currState.clone());
             });
@@ -710,13 +758,12 @@ export class RecordingVisualizer {
         if (this.simulation.controller === 'ui') {
             this.addControls(element);
         }
-        let stats;
         if (this.simulation.showDebugInfo) {
-            stats = new Stats();
-            stats.dom.style.position = 'absolute';
-            stats.dom.style.bottom = '0px';
-            stats.dom.style.removeProperty('top');
-            element.appendChild(stats.dom);
+            this.stats = new Stats();
+            this.stats.dom.style.position = 'absolute';
+            this.stats.dom.style.bottom = '0px';
+            this.stats.dom.style.removeProperty('top');
+            element.appendChild(this.stats.dom);
         }
         const init_data = this.simulation.universes.flatMap((uni) => {
             const currTrail = new PlotlyUniverseTrail(this.simulation.getMaxTrailLength(), typeof uni.color === 'string' ? uni.color : uni.color[0]);
@@ -728,8 +775,8 @@ export class RecordingVisualizer {
                 mode: 'markers',
                 marker: {
                     color: uni.color,
-                    sizemin: 6,
-                    size: uni.currState.bodies.map((body) => Math.min(10, body.mass)),
+                    sizemin: minShowRadius,
+                    size: uni.currState.bodies.map((body) => extrapolateRadius(body.radius, minRadius, maxRadius, minShowRadius, maxShowRadius)),
                 },
             };
             if (this.simulation.getShowTrails()) {
@@ -783,9 +830,9 @@ export class RecordingVisualizer {
                     y: currState.bodies.map((body) => body.position.y),
                     hovertext: currState.bodies.map((body) => body.label),
                     marker: {
-                        size: currState.bodies.map((body) => Math.min(10, body.mass)),
                         color: uni.color,
-                        sizemin: 6,
+                        sizemin: minShowRadius,
+                        size: uni.currState.bodies.map((body) => extrapolateRadius(body.radius, minRadius, maxRadius, minShowRadius, maxShowRadius)),
                     },
                     mode: 'markers',
                 };
@@ -800,8 +847,8 @@ export class RecordingVisualizer {
                 return [currData, trailData];
             });
             Plotly.react(divId, new_data, layout);
-            if (this.simulation.showDebugInfo && stats) {
-                stats.update();
+            if (this.simulation.showDebugInfo && this.stats) {
+                this.stats.update();
             }
             playInd = Math.round(playInd + this.simulation.controls.speed);
             if (playInd < 0) {
@@ -828,6 +875,7 @@ export class RecordingVisualizer {
      * Stop the simulation and visualization.
      */
     stop() {
+        var _a;
         if (this.animationId === null) {
             return;
         }
@@ -839,6 +887,8 @@ export class RecordingVisualizer {
         }
         catch (_) {
         }
+        this.removeControls();
+        (_a = this.stats) === null || _a === void 0 ? void 0 : _a.dom.remove();
     }
 }
 /**
@@ -894,6 +944,14 @@ export class RecordingVisualizer3D {
                 config.showUniverse[u.label] = value;
             });
         });
+        this.gui = gui;
+    }
+    /**
+     * Remove the controls from the visualization.
+     */
+    removeControls() {
+        var _a;
+        (_a = this.gui) === null || _a === void 0 ? void 0 : _a.destroy();
     }
     /**
      * Simulate and play the visualization
@@ -901,8 +959,9 @@ export class RecordingVisualizer3D {
      * @param width width of the visualization.
      * @param height height of the visualization.
      * @param recordFor number of seconds to record for.
+     * @param recordSpeed speed to record the simulation at.
      */
-    start(divId, width, height, recordFor) {
+    start(divId, width, height, recordFor, recordSpeed) {
         if (this.scene !== undefined) {
             console.error('Simulation already playing. Stop the current playtime before initiating a new one.');
             return;
@@ -911,15 +970,19 @@ export class RecordingVisualizer3D {
         if (element === null) {
             return;
         }
-        // const width = element.clientWidth;
-        // const height = element.clientHeight;
-        let maxWidth = 0;
-        let maxHeight = 0;
+        let maxLength = 0;
+        let maxRadius = 0;
+        let minRadius = Infinity;
         this.simulation.universes.forEach((u) => u.currState.bodies.forEach((b) => {
-            maxWidth = Math.max(maxWidth, Math.abs(b.position.x));
-            maxHeight = Math.max(maxHeight, Math.abs(b.position.y));
+            for (let i = 0; i < 3; i++) {
+                maxLength = Math.max(maxLength, Math.abs(b.position.getComponent(i)));
+            }
+            minRadius = Math.min(minRadius, b.radius);
+            maxRadius = Math.max(maxRadius, b.radius);
         }));
-        const scale = 0.5 * Math.min(height / maxHeight, width / maxWidth);
+        const scale = 0.5 * Math.min(height, width) / maxLength;
+        const minShowRadius = 0.015 * Math.min(height, width);
+        const maxShowRadius = 0.04 * Math.min(height, width);
         this.scene = new THREE.Scene();
         const camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, 0, 10000000000);
         camera.position.set(0, 0, Math.max(width, height));
@@ -927,17 +990,6 @@ export class RecordingVisualizer3D {
         renderer.setSize(width, height);
         renderer.autoClear = false;
         element.appendChild(renderer.domElement);
-        let stats;
-        if (this.simulation.showDebugInfo) {
-            stats = new Stats();
-            stats.dom.style.position = 'absolute';
-            stats.dom.style.right = '0px';
-            stats.dom.style.removeProperty('left');
-            element.appendChild(stats.dom);
-        }
-        if (this.simulation.controller === 'ui') {
-            this.addControls(element);
-        }
         // const earthDiv = document.createElement('div');
         // earthDiv.className = 'label';
         // earthDiv.textContent = 'Earthhgkjfdghkjfgh';
@@ -966,19 +1018,34 @@ export class RecordingVisualizer3D {
         this.simulation.universes.forEach((u) => {
             this.universeTrails.push(new ThreeUniverseTrail(this.simulation.maxTrailLength, typeof u.color === 'string' ? u.color : u.color[0], this.scene, scale));
             u.currState.bodies.forEach((b, i) => {
-                const sph = new THREE.SphereGeometry(clipMinMax(Math.log2(b.mass) - 70, 10, 40), 8, 8);
-                const curr = new THREE.WireframeGeometry(sph);
-                const line = new THREE.LineSegments(curr, new THREE.LineBasicMaterial({
+                const sph = new THREE.SphereGeometry(extrapolateRadius(b.radius, minRadius, maxRadius, minShowRadius, maxShowRadius), 12, 12);
+                const group = new THREE.Group();
+                group.add(new THREE.LineSegments(new THREE.WireframeGeometry(sph), new THREE.LineBasicMaterial({
                     color: new THREE.Color(typeof u.color === 'string' ? u.color : u.color[i]),
-                }));
-                this.scene.add(line);
-                line.position.copy(b.position.clone()
+                    transparent: true,
+                    opacity: 0.4,
+                })));
+                group.add(new THREE.Mesh(sph, new THREE.MeshBasicMaterial({
+                    color: new THREE.Color(typeof u.color === 'string' ? u.color : u.color[i]),
+                    transparent: true,
+                    opacity: 0.5,
+                    side: THREE.FrontSide,
+                })));
+                this.scene.add(group);
+                group.position.copy(b.position.clone()
                     .multiplyScalar(scale));
                 // m.set(u.label + " " + b.label, line);
-                arr.push(line);
+                arr.push(group);
             });
         });
         // arr[0].add(earthLabel)
+        if (this.simulation.showDebugInfo) {
+            this.stats = new Stats();
+            this.stats.dom.style.position = 'absolute';
+            this.stats.dom.style.right = '0px';
+            this.stats.dom.style.removeProperty('left');
+            element.appendChild(this.stats.dom);
+        }
         const recordedFrames = [];
         const totalFrames = this.simulation.maxFrameRate * recordFor;
         let playInd = 1;
@@ -986,10 +1053,13 @@ export class RecordingVisualizer3D {
             recordedFrames.push([u.currState.clone()]);
         });
         for (let i = 0; i < totalFrames; i++) {
-            this.simulation.simulateStep(1 / this.simulation.maxFrameRate);
+            this.simulation.simulateStep(recordSpeed / this.simulation.maxFrameRate);
             this.simulation.universes.forEach((u, j) => {
                 recordedFrames[j].push(u.currState.clone());
             });
+        }
+        if (this.simulation.controller === 'ui') {
+            this.addControls(element);
         }
         /**
          * Paint the visualization
@@ -1015,7 +1085,7 @@ export class RecordingVisualizer3D {
                         arr[ind].position.copy(b.position.clone()
                             .multiplyScalar(scale));
                         if (this.simulation.controls.showTrails) {
-                            this.universeTrails[i].addTrail(arr[ind].position);
+                            this.universeTrails[i].addTrail(arr[ind].position.clone());
                         }
                         ind++;
                     });
@@ -1027,8 +1097,8 @@ export class RecordingVisualizer3D {
                     });
                 }
             });
-            if (this.simulation.showDebugInfo && stats) {
-                stats.update();
+            if (this.simulation.showDebugInfo && this.stats) {
+                this.stats.update();
             }
             playInd = Math.round(playInd + this.simulation.controls.speed);
             if (playInd < 0) {
@@ -1060,16 +1130,13 @@ export class RecordingVisualizer3D {
         this.clear = () => {
             renderer.clear();
             renderer.dispose();
-            arr.forEach((a) => {
-                if (Array.isArray(a.material)) {
-                    a.material.forEach((m) => {
-                        m.dispose();
-                    });
-                }
-                else {
-                    a.material.dispose();
-                }
-                a.geometry.dispose();
+            arr.forEach((g) => {
+                g.children.forEach((c) => {
+                    // @ts-ignore
+                    c.geometry.dispose();
+                    // @ts-ignore
+                    c.material.dispose();
+                });
             });
         };
         this.animationId = requestAnimationFrame(paint);
@@ -1078,7 +1145,7 @@ export class RecordingVisualizer3D {
      * Stop the simulation and visualization.
      */
     stop() {
-        var _a;
+        var _a, _b;
         if (this.animationId === null) {
             return;
         }
@@ -1094,5 +1161,7 @@ export class RecordingVisualizer3D {
             ut.popAllTrails();
         });
         this.universeTrails = [];
+        this.removeControls();
+        (_b = this.stats) === null || _b === void 0 ? void 0 : _b.dom.remove();
     }
 }
