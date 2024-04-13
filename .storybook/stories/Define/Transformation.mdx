@@ -4,7 +4,7 @@ import { Meta, Story } from '@storybook/blocks';
 
 # Transformation
 
-TODO
+A **Transformation** object can be used to modify/transform the [frame of reference](https://en.wikipedia.org/wiki/Frame_of_reference) of the nbody system. It has a `transform` method that takes in a state and returns a new state with the updated frame of reference by modifying the position, velocity and acceleration of the bodies as necessary.
 
 ```typescript
 export interface Transformation {
@@ -22,15 +22,16 @@ Full API reference can be found [here](https://source-academy.github.io/nbody/ap
 
 ### Body Center Transformation
 
-TODO
+A frame of reference transformation that uses the position of the ith body as the origin.
 
 ```javascript
 new BodyCenterTransformation();
+new BodyCenterTransformation(index);
 ```
 
 ### Center of Mass Transformation
 
-TODO
+A frame of reference transformation that uses the position of the center of mass of the system as the origin.
 
 ```javascript
 new CoMTransformation();
@@ -38,7 +39,7 @@ new CoMTransformation();
 
 ### Rotate Transformation
 
-TODO
+A frame of reference transformation that rotates the frames around the provided axis by the provided angle.
 
 ```javascript
 new RotateTransformation(new Vector3(0, 1, 0), Math.PI / 2);
@@ -46,7 +47,7 @@ new RotateTransformation(new Vector3(0, 1, 0), Math.PI / 2);
 
 ### Lambda Transformation
 
-TODO
+A frame of reference transformation that uses the given lambda/arrow/anonymous function to transform states.
 
 ```javascript
 new LambdaTransformation((state, deltaT) => {
@@ -60,7 +61,15 @@ new LambdaTransformation((state, deltaT) => {
 You can define and configure your own transformation object in javascript with a transform method as follows
 
 ```javascript
-TODO
+const customTransform = {
+    transform(state) {
+    const offset = state.bodies[0].position.clone();
+    state.bodies.forEach((b) => {
+      b.position.sub(offset);
+    });
+    return state;
+  }
+}
 ```
 
 ## Typescript
@@ -68,5 +77,13 @@ TODO
 You can define and configure your own transformation object in typescript by implementing the Transformation interface as follows
 
 ```typescript
-TODO
+class CustomTransformation implements Transformation {
+  transform(state: State): State {
+    const offset = state.bodies[0].position.clone();
+    state.bodies.forEach((b) => {
+      b.position.sub(offset);
+    });
+    return state;
+  }
+}
 ```

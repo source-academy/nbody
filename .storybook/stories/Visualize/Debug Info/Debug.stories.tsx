@@ -25,6 +25,7 @@ export const DebugInfoOn: Story = {
     storyName: 'DebugInfoOn',
     universe: [fig8],
     showDebugInfo: true,
+        visType: '3D',
   },
 };
 
@@ -33,13 +34,6 @@ export const DebugInfoOff: Story = {
     storyName: 'DebugInfoOff',
     universe: [fig8],
     showDebugInfo: false,
-  },
-};
-
-export const Ui: Story = {
-  args: {
-    storyName: 'Ui',
-    universe: [fig8],
-    controller: 'ui'
+    visType: '3D',
   },
 };

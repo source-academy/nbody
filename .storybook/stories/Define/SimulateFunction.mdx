@@ -4,7 +4,7 @@ import { Meta, Story } from '@storybook/blocks';
 
 # Simulate Function
 
-A **Simulate Function** object encapsulates logic for advancing the state of the universe over time, usually using [numerical integration](https://en.wikipedia.org/wiki/Numerical_integration). It has a simulate method that takes in a time step, current state of the universe, (optionally the previous state of the universe) and returns the next state of the universe.
+A **Simulate Function** object encapsulates logic for advancing the state of the universe over time, usually using [numerical integration](https://en.wikipedia.org/wiki/Numerical_integration). It has a `simulate` method that takes in a time step, current state of the universe, (optionally the previous state of the universe) and returns the next state of the universe.
 
 ```typescript
 interface SimulateFunction {
@@ -22,7 +22,7 @@ Full API reference can be found [here](https://source-academy.github.io/nbody/ap
 
 ### Velocity Verlet
 
-Create a [velocity verlet](https://en.wikipedia.org/wiki/Verlet_integration#Velocity_Verlet) integrator. Uses newtonian gravity by default, or the provided force object.
+A [velocity verlet](https://en.wikipedia.org/wiki/Verlet_integration#Velocity_Verlet) integrator implementation. Uses newtonian gravity by default, or the provided force object.
 
 ```javascript
 new VelocityVerletSim();
@@ -31,7 +31,7 @@ new VelocityVerletSim(customForce);
 
 ### Explicit Euler
 
-Create a [explicit euler](https://en.wikipedia.org/wiki/Explicit_and_implicit_methods) integrator. Uses newtonian gravity by default, or the provided force object.
+An [explicit euler](https://en.wikipedia.org/wiki/Explicit_and_implicit_methods) integrator implementation. Uses newtonian gravity by default, or the provided force object.
 
 ```javascript
 new ExplicitEulerSim();
@@ -40,7 +40,7 @@ new ExplicitEulerSim(customForce);
 
 ### Semi Implicit Euler
 
-Create a [semi-implicit euler](https://en.wikipedia.org/wiki/Explicit_and_implicit_methods) integrator. Uses newtonian gravity by default, or the provided force object.
+A [semi-implicit euler](https://en.wikipedia.org/wiki/Explicit_and_implicit_methods) integrator implementation. Uses newtonian gravity by default, or the provided force object.
 
 ```javascript
 new SemiImplicitEulerSim();
@@ -49,7 +49,7 @@ new SemiImplicitEulerSim(customForce);
 
 ### Runge-Kutta Order 4
 
-Create a [runge-kutta order 4](https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods) integrator. Uses newtonian gravity by default, or the provided force object. Optionally, you can provide the weight coefficients for the averaging step.
+A [runge-kutta order 4](https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods) integrator implementation. Uses newtonian gravity by default, or the provided force object. Optionally, you can provide the weight coefficients for the averaging step.
 
 ```javascript
 new RungeKutta4Sim();
@@ -59,7 +59,7 @@ new RungeKutta4Sim(customForce, [1, 2, 2, 1]);
 
 ### Lambda integrator
 
-Create a simulate function from a lambda function.
+A simulate function based the given lambda/arrow/anonymous function.
 
 ```javascript
 new LambdaSim((deltaT, currState, prevState) => {

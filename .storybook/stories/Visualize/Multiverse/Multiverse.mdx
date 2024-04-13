@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/blocks';
+import { Meta, Story } from "@storybook/blocks";
 
 import * as MultiverseStories from "./Multiverse.stories";
 
@@ -6,22 +6,38 @@ import * as MultiverseStories from "./Multiverse.stories";
 
 # Multiverse
 
-TODO
+You can setup multiple universes in a single simulation. This is useful for simulating multiple n-body systems in parallel with varying initial configurations, forces, simuation functions and/or transformations. Simply create each universe as you would for a single universe simulation and pass them as an array to the **Simulation** object in the following way. Available for both 2D and 3D visualizations, UI controls (when enabled) are provided to hide/show each universe separately (see [Controller](?path=/docs/visualize-controller--docs)).
 
 ## Single Universe - 2D
-```js
 
+```js
+new Simulation(universe);
+new Simulation([universe]);
 ```
-<center><Story of={MultiverseStories.SingleUniverse} name="SingleUniverse" /></center>
+
+<center>
+  <Story of={MultiverseStories.SingleUniverse} name="SingleUniverse" />
+</center>
 
 ## Multiverse - 2D
-```js
 
+```js
+new Simulation([universe1, universe2], {});
 ```
-<center><Story of={MultiverseStories.Multiverse} name="Multiverse" /></center>
+
+<center>
+  <Story of={MultiverseStories.Multiverse} name="Multiverse" />
+</center>
 
 ## Multiverse - 3D
-```js
 
+```js
+new Simulation([universe1, universe2], {
+  visType: "3D",
+  controller: 'ui',
+});
 ```
-<center><Story of={MultiverseStories.Multiverse3D} name="Multiverse3D" /></center>
+
+<center>
+  <Story of={MultiverseStories.Multiverse3D} name="Multiverse3D" />
+</center>

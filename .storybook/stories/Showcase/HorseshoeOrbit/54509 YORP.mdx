@@ -1,13 +1,22 @@
-import { Meta, Story } from '@storybook/blocks';
+import { Meta, Story, Controls } from '@storybook/blocks';
 
 import * as Stories from "./HorseshoeOrbit.stories";
 
-<Meta title="Showcase/HorseshoeOrbit/54509 YORP" />
+<Meta title="Showcase/Horseshoe Orbit/54509 YORP" />
 
 # 54509 YORP
 
-54509 YORP is an Earth co-orbital asteroid that follows a horse shoe orbit
+[54509 YORP](https://en.wikipedia.org/wiki/54509_YORP) is an Earth co-orbital asteroid that follows a flattened horse shoe orbit that looks like the following in frames of refernce snapped to sun-earth and sun respectively:
 
+<center>
+<img src="https://upload.wikimedia.org/wikipedia/commons/d/dd/Animation_of_54509_YORP_orbit.gif" alt="54509 YORP orbit" width="400"/>
+<img src="https://upload.wikimedia.org/wikipedia/commons/6/60/Animation_of_54509_YORP_orbit_around_Sun.gif" alt="54509 YORP orbit around Sun" width="400"/>
 
+GIFs from Wiki Commons - <a title="Phoenix7777, CC BY-SA 4.0 &lt;https://creativecommons.org/licenses/by-sa/4.0&gt;, via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Animation_of_54509_YORP_orbit.gif">gif1</a>, 
+<a title="Phoenix7777, CC BY-SA 4.0 &lt;https://creativecommons.org/licenses/by-sa/4.0&gt;, via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Animation_of_54509_YORP_orbit_around_Sun.gif">gif2</a>
+</center>
 
-<Story of={Stories.YORP} />
+The initial configurations of Sun, Earth and the asteriod have been setup, recorded at 20000000x speed for about 5.5 minutes of playback. Use the speed control below to change the playback speed. You can also try changing the frame of reference to see the horseshoe orbit from different perspectives.
+
+<Controls of={Stories.YORP} />
+<center><Story of={Stories.YORP} /></center>

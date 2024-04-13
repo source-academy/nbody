@@ -1,4 +1,0 @@
-import{j as t}from"./jsx-runtime-DRTy3Uxn.js";import{useMDXComponents as e}from"./index-z5U8iC57.js";import{M as s,d as a,C as i}from"./index-SQMR4-IU.js";import{SunMarsAnalemma as r}from"./Analemma.stories-D2TdEEue.js";import"./index-BBkUAzwr.js";import"./iframe-BaWYFvPh.js";import"../sb-preview/runtime.js";import"./index-PqR-_bA4.js";import"./index-DrlA5mbP.js";import"./index-DrFu-skq.js";import"./Universe-DpKi-MhS.js";import"./Transformation-ClZa9c5r.js";function m(n){const o={h1:"h1",...e(),...n.components};return t.jsxs(t.Fragment,{children:[t.jsx(s,{title:"Showcase/Analemma/Sun-Mars"}),`
-`,t.jsx(o.h1,{id:"sun-mars-analemma",children:"Sun-Mars Analemma"}),`
-`,t.jsx(a,{of:r}),`
-`,t.jsx(i,{of:r})]})}function A(n={}){const{wrapper:o}={...e(),...n.components};return o?t.jsx(o,{...n,children:t.jsx(m,{...n})}):m(n)}export{A as default};

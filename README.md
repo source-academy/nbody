@@ -1,6 +1,6 @@
 # nbody
 
-N-body simulations as a Source Academy module.
+JS/TS library to run n-body simulations on the browser. Documentation available [here](https://source-academy.github.io/nbody/api)
 
 ## Installation
 
@@ -18,6 +18,6 @@ yarn add nbody three @types/three plotly.js-dist @types/plotly.js
 
 ## Usage
 
-Full API Documentation available [here](https://source-academy.github.io/nbody/).
+Full API Documentation available [here](https://source-academy.github.io/nbody/api).
 
 ## For developers

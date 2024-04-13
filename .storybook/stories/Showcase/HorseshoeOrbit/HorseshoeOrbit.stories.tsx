@@ -1,38 +1,43 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Simulation } from "../../Simulation";
-import { horseshoe } from "./HorseshoeOrbit";
+import { HorseshoeOrbit, yorp, so16 } from "./HorseshoeOrbit";
 
 const meta = {
   title: "Showcase/Horseshoe Orbit",
-  component: Simulation,
+  component: HorseshoeOrbit,
   parameters: {
     layout: "centered",
-    controls: {
-      disable: true,
-    },
   },
   tags: [],
-  argTypes: {},
+  argTypes: {
+    obj: {
+      table: {
+        disable: true,
+      }
+    },
+        name: {
+      table: {
+        disable: true,
+      }
+    },
+  },
   args: {},
-} satisfies Meta<typeof Simulation>;
+} satisfies Meta<typeof HorseshoeOrbit>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const YORP: Story = {
   args: {
-    storyName: "Horseshoe Orbit YORP",
-    universe: [horseshoe.yorp],
-    showDebugInfo: true,
-    controller: "ui",
-    visType: "3D",
-    width: 800,
-    playSpeed: 2,
-    showTrails: true,
-    record: true,
-    looped: true,
-    recordFor: 332,
-    recordSpeed: 20000000,
-    maxTrailLength: 2000,
+    name: "Horseshoe Orbit YORP",
+    frameOfRef: "sun-earth",
+    obj: yorp
+  },
+};
+
+export const SO16: Story = {
+  args: {
+    name: "Horseshoe Orbit SO16",
+    frameOfRef: "sun-earth",
+    obj: so16,
   },
 };

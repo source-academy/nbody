@@ -1,0 +1,4 @@
+import{j as o}from"./jsx-runtime-DRTy3Uxn.js";import{useMDXComponents as n}from"./index-z5U8iC57.js";import{M as i,d as m}from"./index-DVskBQuG.js";import{Recorded as d}from"./SolarSystem.stories-2o-H9JCP.js";import"./index-BBkUAzwr.js";import"./iframe-Dx-CAhZM.js";import"../sb-preview/runtime.js";import"./index-PqR-_bA4.js";import"./index-DrlA5mbP.js";import"./index-DrFu-skq.js";import"./Universe-PvbTHax1.js";import"./Transformation-DxaXQl0Q.js";function r(e){const t={h1:"h1",p:"p",...n(),...e.components};return o.jsxs(o.Fragment,{children:[o.jsx(i,{title:"Showcase/Solar System/Recorded"}),`
+`,o.jsx(t.h1,{id:"recorded",children:"Recorded"}),`
+`,o.jsx(t.p,{children:"Recorded ~247 years of simulated time, which is the orbital period of Pluto, and played on loop."}),`
+`,o.jsx("center",{children:o.jsx(m,{of:d,name:"Recorded"})})]})}function y(e={}){const{wrapper:t}={...n(),...e.components};return t?o.jsx(t,{...e,children:o.jsx(r,{...e})}):r(e)}export{y as default};

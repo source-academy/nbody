@@ -4,5 +4,38 @@ import * as TrailsStories from "./Trails.stories";
 
 <Meta title="Visualize/Trails" />
 
-<Story of={TrailsStories.ShowTrailsOff} name="ShowTrailsOff" />
-<Story of={TrailsStories.ShowTrailsOn} name="ShowTrailsOn" />
+# Trails
+
+Trails are the paths that objects take as they move through space. They can be shown or hidden using the `showTrails` field when creating a **Simulation** object in the following way. Once simulation is running, trails can be toggled on or off using the UI controls or through code, when controller is set to `ui` or `code` respectively. Maximum trail length can also be set using the `maxTrailLength` field, and this is the maximum number of points that will be tracked for all objects combined. Available in both 2D and 3D views.
+
+```js
+new Simulation(universe, {
+    showTrails: true | false,
+    maxTrailLength: number,
+})
+```
+
+## Off (default)
+
+When set to false, trails are not shown.
+
+```js
+new Simulation(universe, {
+    showTrails: false
+})
+```
+
+<center><Story of={TrailsStories.ShowTrailsOff} name="ShowTrailsOff" /></center>
+
+## On
+
+When set to true, trails are shown.
+
+```js
+new Simulation(universe, {
+    showTrails: true
+})
+```
+
+
+<center><Story of={TrailsStories.ShowTrailsOn} name="ShowTrailsOn" /></center>

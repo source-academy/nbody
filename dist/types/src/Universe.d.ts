@@ -19,6 +19,10 @@ export type UniverseConfig = {
      */
     color: string | string[];
     /**
+     * Scale the radius of the bodies in the Universe. Default is 1.
+     */
+    radiusScale: number;
+    /**
      * Label of the Universe.
      */
     label: string;
@@ -42,6 +46,10 @@ export declare class Universe {
      * Color of the bodies in the Universe. A single color applied to all bodies or an array of colors applied to each body respectively. Incase of array, length should match the number of bodies in the state.
      */
     color: string | string[];
+    /**
+     * Scale the radius of the bodies in the Universe. Default is 1.
+     */
+    radiusScale: number;
     /**
      * Label of the Universe.
      */
