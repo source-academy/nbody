@@ -5,20 +5,6 @@ import Stats from 'stats.js';
 import * as THREE from 'three';
 import { OrbitControls, ViewHelper } from 'three/examples/jsm/Addons.js';
 /**
- * Extrapolates a value from a range to another range.
- * @param val value to extrapolate.
- * @param minR minimum value of the input range.
- * @param maxR maximum value of the input range.
- * @param low minimum value of the output range.
- * @param high maximum value of the output range.
- * @returns extrapolated value.
- */
-function extrapolateRadius(val, minR, maxR, low, high) {
-    if (minR === maxR)
-        return (low + high) / 2;
-    return low + ((val - minR) / (maxR - minR)) * (high - low);
-}
-/**
  * Container object for body trails in a 2D universe based in Plotly.
  */
 class PlotlyUniverseTrail {
@@ -146,17 +132,11 @@ export class RealTimeVisualizer {
         // const height = element.clientHeight;
         let maxWidth = 0;
         let maxHeight = 0;
-        let maxRadius = 0;
-        let minRadius = Infinity;
         this.simulation.universes.forEach((u) => u.currState.bodies.forEach((b) => {
             maxWidth = Math.max(maxWidth, Math.abs(b.position.x));
             maxHeight = Math.max(maxHeight, Math.abs(b.position.y));
-            minRadius = Math.min(minRadius, b.radius);
-            maxRadius = Math.max(maxRadius, b.radius);
         }));
         const scale = 0.5 * Math.min(height / maxHeight, width / maxWidth);
-        const minShowRadius = 0.01 * Math.min(height, width);
-        const maxShowRadius = 0.05 * Math.min(height, width);
         const layout = {
             paper_bgcolor: '#000000',
             plot_bgcolor: '#000000',
@@ -196,8 +176,8 @@ export class RealTimeVisualizer {
                 mode: 'markers',
                 marker: {
                     color: uni.color,
-                    sizemin: minShowRadius,
-                    size: uni.currState.bodies.map((body) => extrapolateRadius(body.radius, minRadius, maxRadius, minShowRadius, maxShowRadius)),
+                    sizemin: 5,
+                    size: uni.currState.bodies.map((body) => body.radius * uni.radiusScale),
                 },
             };
             if (this.simulation.getShowTrails()) {
@@ -269,8 +249,8 @@ export class RealTimeVisualizer {
                     hovertext: uni.currState.bodies.map((body) => body.label),
                     marker: {
                         color: uni.color,
-                        sizemin: minShowRadius,
-                        size: uni.currState.bodies.map((body) => extrapolateRadius(body.radius, minRadius, maxRadius, minShowRadius, maxShowRadius)),
+                        size: uni.currState.bodies.map((body) => body.radius * uni.radiusScale),
+                        sizemin: 5,
                     },
                     mode: 'markers',
                 };
@@ -455,18 +435,12 @@ export class RealTimeVisualizer3D {
         }
         element.style.position = 'relative';
         let maxLength = 0;
-        let maxRadius = 0;
-        let minRadius = Infinity;
         this.simulation.universes.forEach((u) => u.currState.bodies.forEach((b) => {
             for (let i = 0; i < 3; i++) {
                 maxLength = Math.max(maxLength, Math.abs(b.position.getComponent(i)));
             }
-            minRadius = Math.min(minRadius, b.radius);
-            maxRadius = Math.max(maxRadius, b.radius);
         }));
         const scale = 0.5 * Math.min(height, width) / maxLength;
-        const minShowRadius = 0.015 * Math.min(height, width);
-        const maxShowRadius = 0.04 * Math.min(height, width);
         this.scene = new THREE.Scene();
         const camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, 0, 10000000000);
         camera.position.set(0, 0, Math.max(width, height));
@@ -512,7 +486,7 @@ export class RealTimeVisualizer3D {
         this.simulation.universes.forEach((u) => {
             this.universeTrails.push(new ThreeUniverseTrail(this.simulation.maxTrailLength, typeof u.color === 'string' ? u.color : u.color[0], this.scene, scale));
             u.currState.bodies.forEach((b, i) => {
-                const sph = new THREE.SphereGeometry(extrapolateRadius(b.radius, minRadius, maxRadius, minShowRadius, maxShowRadius), 12, 12);
+                const sph = new THREE.SphereGeometry(b.radius * scale * u.radiusScale, 12, 12);
                 const group = new THREE.Group();
                 group.add(new THREE.LineSegments(new THREE.WireframeGeometry(sph), new THREE.LineBasicMaterial({
                     color: new THREE.Color(typeof u.color === 'string' ? u.color : u.color[i]),
@@ -733,17 +707,11 @@ export class RecordingVisualizer {
         }
         let maxWidth = 0;
         let maxHeight = 0;
-        let maxRadius = 0;
-        let minRadius = Infinity;
         this.simulation.universes.forEach((u) => u.currState.bodies.forEach((b) => {
             maxWidth = Math.max(maxWidth, Math.abs(b.position.x));
             maxHeight = Math.max(maxHeight, Math.abs(b.position.y));
-            minRadius = Math.min(minRadius, b.radius);
-            maxRadius = Math.max(maxRadius, b.radius);
         }));
         const scale = 0.5 * Math.min(height / maxHeight, width / maxWidth);
-        const minShowRadius = 0.01 * Math.min(height, width);
-        const maxShowRadius = 0.05 * Math.min(height, width);
         const recordedFrames = [];
         const totalFrames = this.simulation.maxFrameRate * recordFor;
         let playInd = 1;
@@ -795,8 +763,8 @@ export class RecordingVisualizer {
                 mode: 'markers',
                 marker: {
                     color: uni.color,
-                    sizemin: minShowRadius,
-                    size: uni.currState.bodies.map((body) => extrapolateRadius(body.radius, minRadius, maxRadius, minShowRadius, maxShowRadius)),
+                    sizemin: 5,
+                    size: uni.currState.bodies.map((body) => body.radius * uni.radiusScale),
                 },
             };
             if (this.simulation.getShowTrails()) {
@@ -851,8 +819,8 @@ export class RecordingVisualizer {
                     hovertext: currState.bodies.map((body) => body.label),
                     marker: {
                         color: uni.color,
-                        sizemin: minShowRadius,
-                        size: uni.currState.bodies.map((body) => extrapolateRadius(body.radius, minRadius, maxRadius, minShowRadius, maxShowRadius)),
+                        sizemin: 5,
+                        size: uni.currState.bodies.map((body) => body.radius * uni.radiusScale),
                     },
                     mode: 'markers',
                 };
@@ -1003,18 +971,12 @@ export class RecordingVisualizer3D {
             return;
         }
         let maxLength = 0;
-        let maxRadius = 0;
-        let minRadius = Infinity;
         this.simulation.universes.forEach((u) => u.currState.bodies.forEach((b) => {
             for (let i = 0; i < 3; i++) {
                 maxLength = Math.max(maxLength, Math.abs(b.position.getComponent(i)));
             }
-            minRadius = Math.min(minRadius, b.radius);
-            maxRadius = Math.max(maxRadius, b.radius);
         }));
         const scale = 0.5 * Math.min(height, width) / maxLength;
-        const minShowRadius = 0.015 * Math.min(height, width);
-        const maxShowRadius = 0.04 * Math.min(height, width);
         this.scene = new THREE.Scene();
         const camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, 0, 10000000000);
         camera.position.set(0, 0, Math.max(width, height));
@@ -1050,7 +1012,7 @@ export class RecordingVisualizer3D {
         this.simulation.universes.forEach((u) => {
             this.universeTrails.push(new ThreeUniverseTrail(this.simulation.maxTrailLength, typeof u.color === 'string' ? u.color : u.color[0], this.scene, scale));
             u.currState.bodies.forEach((b, i) => {
-                const sph = new THREE.SphereGeometry(extrapolateRadius(b.radius, minRadius, maxRadius, minShowRadius, maxShowRadius), 12, 12);
+                const sph = new THREE.SphereGeometry(b.radius * scale * u.radiusScale, 12, 12);
                 const group = new THREE.Group();
                 group.add(new THREE.LineSegments(new THREE.WireframeGeometry(sph), new THREE.LineBasicMaterial({
                     color: new THREE.Color(typeof u.color === 'string' ? u.color : u.color[i]),
@@ -1170,6 +1132,7 @@ export class RecordingVisualizer3D {
                     c.material.dispose();
                 });
             });
+            renderer.domElement.remove();
         };
         this.animationId = requestAnimationFrame(paint);
     }

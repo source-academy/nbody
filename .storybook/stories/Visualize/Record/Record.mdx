@@ -4,6 +4,52 @@ import * as RecordStories from "./Record.stories";
 
 <Meta title="Visualize/Record" />
 
-<Story of={RecordStories.RealTime} name="Record" />
-<Story of={RecordStories.Recorded} name="Record" />
-<Story of={RecordStories.RecordedLooped} name="Record" />
+# Record
+
+You can simulate and visualize the n-body system in real-time or record the simulation and play it back later. Simply set the `record` field when creating a **Simulation** object in the following way. Available in both 2D and 3D views.
+
+```js
+new Simulation(universe, {
+  record: true,
+})
+```
+
+## Real-Time (Default)
+
+The universe(s) are simulated and visualized in real-time.
+```js
+new Simulation(universe, {})
+new Simulation(universe, {
+  record: false,
+})
+```
+
+<center><Story of={RecordStories.RealTime} name="Real-time" /></center>
+
+
+## Recorded
+
+The universe(s) are simulated at `recordSpeed` and recorded completely for `recordFor` seconds worth of playback. The recording can then be played back at any specified speed include -ve values for reverse playback.
+
+```js
+const sim = new Simulation(universe, {
+  record: true,
+})
+// divId, width, height, playSpeed, startPaused, recordFor, recordSpeed
+sim.start(<div-id, <width>, <height>, 1, false, 60, 2)
+```
+
+<center><Story of={RecordStories.Recorded} name="Record" /></center>
+
+## Recorded and Looped
+
+The recorded simulation can also be looped indefinitely with the `looped` field set to `true` in the **Simulation** object - upon reaching the end of the recording, loops back to the start and loops back to the end in case of reverse playback. The recorded playback is not looped by default.
+
+```js
+new Simulation(universe, {
+  record: true,
+  looped: true,
+})
+```
+
+<center><Story of={RecordStories.RecordedLooped} name="RecordLooped" /></center>

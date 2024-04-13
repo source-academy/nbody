@@ -24,6 +24,7 @@ export const SingleUniverse: Story = {
   args: {
     storyName: 'SingleUniverse',
     universe: [fig8],
+        width: 600,
   },
 };
 
@@ -31,7 +32,7 @@ export const Multiverse: Story = {
   args: {
     storyName: 'Multiverse',
     universe: multiFig8,
-    // showTrails: true,
+    width: 600,
   },
 };
 
@@ -40,7 +41,7 @@ export const Multiverse3D: Story = {
     storyName: 'Multiverse3D',
     universe: multiFig8,
     visType: '3D',
-    showTrails: true,
-    showDebugInfo: true,
+    controller: 'ui',
+    width: 600,
   },
 };

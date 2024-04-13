@@ -20,6 +20,10 @@ export type UniverseConfig = {
    */
   color: string | string[];
   /**
+   * Scale the radius of the bodies in the Universe. Default is 1.
+   */
+  radiusScale: number;
+  /**
    * Label of the Universe.
    */
   label: string;
@@ -44,6 +48,10 @@ export class Universe {
    * Color of the bodies in the Universe. A single color applied to all bodies or an array of colors applied to each body respectively. Incase of array, length should match the number of bodies in the state.
    */
   color: string | string[];
+  /**
+   * Scale the radius of the bodies in the Universe. Default is 1.
+   */
+  radiusScale: number;
   /**
    * Label of the Universe.
    */
@@ -75,6 +83,7 @@ export class Universe {
       = config.transformations === undefined
         ? []
         : config.transformations;
+    this.radiusScale = config.radiusScale === undefined ? 1 : config.radiusScale;
   }
 
   /**
@@ -104,6 +113,7 @@ export class Universe {
       prevState: this.prevState.clone(),
       currState: this.currState.clone(),
       color: this.color,
+      radiusScale: this.radiusScale,
       label: this.label,
       simFunc: this.simFunc,
       transformations: this.transformations,

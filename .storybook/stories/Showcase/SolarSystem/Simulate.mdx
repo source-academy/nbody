@@ -1,0 +1,11 @@
+import { Meta, Story } from '@storybook/blocks';
+
+import * as Stories from "./SolarSystem.stories";
+
+<Meta title="Showcase/Solar System/Simulate" />
+
+# Simulate
+
+The Solar system has been setup based on positions and velocities of the planets on 1st January 2024. You can simulate the system at a high speed to oberve the traced orbits. However, keep in mind that the faster you simulate, the less accurate the orbits will be (due to the numerical integration method used). 
+
+<center><Story of={Stories.Simulate} name="Simulate" /></center>

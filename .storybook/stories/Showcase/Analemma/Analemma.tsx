@@ -23,7 +23,8 @@ const SUN = new CelestialBody(
 const EARTH = new CelestialBody(
   "Earth",
   5.97219e24,
-  6371e3,
+  // 6371e3,
+  2e8,
   //   new Vector3(-2.48109932596539e10, 1.449948612736719e11, -8.215203670851886e6),
   //   new Vector3(-2.984146365518679e4, -5.126262286859617e3, 1.184224839788195),
   //   new Vector3(0, 0, 0)
@@ -36,7 +37,8 @@ const EARTH = new CelestialBody(
 const MARS = new CelestialBody(
   "Mars",
   6.41e23,
-  3389.5e3,
+  // 3389.5e3,
+  2.5e8,
   // new Vector3(
   //   -4.388577457378983e10,
   //   -2.170849264747524e11,
@@ -88,6 +90,7 @@ export const sunEarth: AnalemmaSetup = {
           366.24 * 86164.0905
         ),
       ],
+      radiusScale: 10,
     });
     newUniverse.currState = new RotateTransformation(
       new Vector3(1, 0, 0),
@@ -126,6 +129,7 @@ export const sunMars: AnalemmaSetup = {
           668.5991 * 88775.244
         ),
       ],
+      radiusScale: 20,
     });
     newUniverse.currState = new RotateTransformation(
       new Vector3(1, 0, 0),

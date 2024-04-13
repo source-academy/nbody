@@ -6,20 +6,37 @@ import * as DimensionStories from "./Dimension.stories";
 
 # Dimension
 
-TODO
+You can choose a 2 dimensional or 3 dimensional visualization system for your simulation. Simply set the `visType` field when creating a **Simulation** object in the following way.
+
+```js
+new Simulation(universe, {
+  visType: '2D' | '3D',
+})
+```
 
 ## 2D (default)
+
+The 2D visualization system uses [Plotly.js](https://plotly.com/javascript/). It provides default controls for panning, zooming, and scaling the view, along with responsive axes indicating the scale of the universe(s) being visualized. Additionally, you can hover on bodies to see their details like label and position.
+
 ```js
 new Simulation(universe, {
   visType: '2D',
 })
 ```
+
 <center><Story of={DimensionStories.TwoD} name="2D" /></center>
 
 ## 3D
+
+The 3D visualization system uses [Three.js](https://threejs.org/). There is a small orientation helper at the bottom right provided for easier navigation along with coloured axes. You can control the visualization as follows:
+- Orbit around the center of the frame by holding down the left click and moving the mouse in direction of choice
+- Scroll up to zoom in and down to zoom out
+- Pan around by holding down the right click and moving the mouse in direction of choice.
+
 ```js
 new Simulation(universe, {
   visType: '3D',
 })
 ```
+
 <center><Story of={DimensionStories.ThreeD} name="3D" /></center>

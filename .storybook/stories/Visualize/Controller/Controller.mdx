@@ -4,7 +4,20 @@ import * as ControllerStories from "./Controller.stories";
 
 <Meta title="Visualize/Controller" />
 
+# Controller
+
+**Simulation** objects can be controlled in three ways - through the UI, through code, or not at all. You can set the `controller` field when creating a **Simulation** object in the following way. Controls include play, pause, speed, show/hide trails and show/hide each universe. Available in both 2D and 3D views.
+
+```js
+new Simulation(universe, {
+    controller: 'none' | 'ui' | 'code',
+})
+```
+
 ## None (default)
+
+When set to none, simulation cannot be controlled through the UI or code.
+
 ```js
 new Simulation(universe, {
     controller: 'none'
@@ -13,6 +26,9 @@ new Simulation(universe, {
 <center><Story of={ControllerStories.None} name="None" /></center>
 
 ## Ui
+
+Displays UI controls to change speed, show/hide trails and show/hide each universe.
+
 ```js
 new Simulation(universe, {
   controller: 'ui'
@@ -21,9 +37,15 @@ new Simulation(universe, {
 <center><Story of={ControllerStories.Ui} name="Ui" /></center>
 
 ## Code
+
+Allows you to control the simulation through code via methods on the **Simulation** object. Full API reference available [here](https://source-academy.github.io/nbody/api/classes/Simulation.html).
+
 ```js
 new Simulation(universe, {
     controller: 'code'
+    showTrails: true,
 })
+
+// toggle show/hide universe every 500 ms
 ```
 <center><Story of={ControllerStories.Code} name="Code" /></center>

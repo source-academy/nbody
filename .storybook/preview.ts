@@ -9,7 +9,7 @@ const preview: Preview = {
       },
     }, options: {
       storySort: {
-        order: ['nbody', 'Installation', 'Quick Start', 'Integration', 'Contribute', 'Define', ['Intro', 'Force', 'Simulate Function', 'Transformation'], 'Visualize', ['Intro', 'Dimension', 'Multiverse', 'Record', 'Controller', 'Trails', 'Debug Info'], 'Showcase', ['Intro', 'Analemma', ['Intro', 'Sun-Earth', 'Sun-Mars'],'HorseshoeOrbit', ['Intro', '54509 YORP'], 'SolarSystem']],
+        order: ['nbody', 'Installation', 'Quick Start', 'Integration', 'Contribute', 'Define', ['Intro', 'Force', 'Simulate Function', 'Transformation'], 'Visualize', ['Intro', 'Dimension', 'Multiverse', 'Record', 'Controller', 'Trails', 'Debug Info'], 'Showcase', ['Intro', 'Analemma', ['Intro', 'Sun-Earth', 'Sun-Mars'],'Horseshoe Orbit', ['Intro', '2010 SO16', '54509 YORP'], 'Solar System', ['Simulate', 'Recorded']]],
       },
     }
   },

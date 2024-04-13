@@ -23,6 +23,7 @@ export class Universe {
             = config.transformations === undefined
                 ? []
                 : config.transformations;
+        this.radiusScale = config.radiusScale === undefined ? 1 : config.radiusScale;
     }
     /**
      * Simulate a step in the Universe using the SimulateFunction and Transformations.
@@ -46,6 +47,7 @@ export class Universe {
             prevState: this.prevState.clone(),
             currState: this.currState.clone(),
             color: this.color,
+            radiusScale: this.radiusScale,
             label: this.label,
             simFunc: this.simFunc,
             transformations: this.transformations,

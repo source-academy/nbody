@@ -1,0 +1,7 @@
+import{j as o}from"./jsx-runtime-DRTy3Uxn.js";import{useMDXComponents as s}from"./index-z5U8iC57.js";import{M as n}from"./index-DVskBQuG.js";import"./HorseshoeOrbit.stories-TS9WRF8U.js";import"./index-BBkUAzwr.js";import"./iframe-Dx-CAhZM.js";import"../sb-preview/runtime.js";import"./index-PqR-_bA4.js";import"./index-DrlA5mbP.js";import"./index-DrFu-skq.js";import"./Universe-PvbTHax1.js";import"./Transformation-DxaXQl0Q.js";function t(r){const e={a:"a",h1:"h1",li:"li",p:"p",ul:"ul",...s(),...r.components};return o.jsxs(o.Fragment,{children:[o.jsx(n,{title:"Showcase/Horseshoe Orbit/Intro"}),`
+`,o.jsx(e.h1,{id:"horseshoe-orbits",children:"Horseshoe Orbits"}),`
+`,o.jsx(e.p,{children:"Horseshoe orbits are a type of co-orbital motion of a small body around a larger body. The orbital period of the smaller body is very close to that of the larger body, and the two bodies are in a 1:1 orbital resonance. The smaller body appears to move in a horseshoe shape relative to the larger body as seen from a non-rotating frame of reference. Read on to find out more about and see horse shoe orbits in action."}),`
+`,o.jsxs(e.ul,{children:[`
+`,o.jsx(e.li,{children:o.jsx(e.a,{href:"?path=/docs/showcase-horseshoeorbit-2010-so16--docs",children:"2010 SO16"})}),`
+`,o.jsx(e.li,{children:o.jsx(e.a,{href:"?path=/docs/showcase-horseshoeorbit-54509-yorp--docs",children:"54509 YORP"})}),`
+`]})]})}function j(r={}){const{wrapper:e}={...s(),...r.components};return e?o.jsx(e,{...r,children:o.jsx(t,{...r})}):t(r)}export{j as default};

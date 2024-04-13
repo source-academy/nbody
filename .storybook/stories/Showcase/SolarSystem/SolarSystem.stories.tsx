@@ -1,10 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Simulation } from "../../Simulation";
-import { fig8 } from "../../Universe";
+import { SolarSystem, solarRecorded, solarSimulate } from "./SolarSystem";
 
 const meta = {
   title: "Showcase/Solar System",
-  component: Simulation,
+  component: SolarSystem,
   parameters: {
     layout: "centered",
     controls: {
@@ -14,14 +13,21 @@ const meta = {
   tags: [],
   argTypes: {},
   args: {},
-} satisfies Meta<typeof Simulation>;
+} satisfies Meta<typeof SolarSystem>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const SolarSystem: Story = {
+export const Simulate: Story = {
   args: {
-    storyName: "3D",
-    universe: [fig8],
+    name: "Solar System",
+    obj: solarSimulate
+  },
+};
+
+export const Recorded: Story = {
+  args: {
+    name: "Solar System",
+    obj: solarRecorded
   },
 };

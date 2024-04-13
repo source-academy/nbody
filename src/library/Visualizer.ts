@@ -10,26 +10,6 @@ import { type Universe } from '../Universe';
 import { type Visualizer } from '../Visualizer';
 
 /**
- * Extrapolates a value from a range to another range.
- * @param val value to extrapolate.
- * @param minR minimum value of the input range.
- * @param maxR maximum value of the input range.
- * @param low minimum value of the output range.
- * @param high maximum value of the output range.
- * @returns extrapolated value.
- */
-function extrapolateRadius(
-  val: number,
-  minR: number,
-  maxR: number,
-  low: number,
-  high: number,
-): number {
-  if (minR === maxR) return (low + high) / 2;
-  return low + ((val - minR) / (maxR - minR)) * (high - low);
-}
-
-/**
  * Container object for body trails in a 2D universe based in Plotly.
  */
 class PlotlyUniverseTrail {
@@ -178,17 +158,11 @@ export class RealTimeVisualizer implements Visualizer {
     // const height = element.clientHeight;
     let maxWidth = 0;
     let maxHeight = 0;
-    let maxRadius = 0;
-    let minRadius = Infinity;
     this.simulation.universes.forEach((u) => u.currState.bodies.forEach((b) => {
       maxWidth = Math.max(maxWidth, Math.abs(b.position.x));
       maxHeight = Math.max(maxHeight, Math.abs(b.position.y));
-      minRadius = Math.min(minRadius, b.radius);
-      maxRadius = Math.max(maxRadius, b.radius);
     }));
     const scale = 0.5 * Math.min(height / maxHeight, width / maxWidth);
-    const minShowRadius = 0.01 * Math.min(height, width);
-    const maxShowRadius = 0.05 * Math.min(height, width);
 
     const layout: Partial<Layout> = {
       paper_bgcolor: '#000000',
@@ -236,14 +210,8 @@ export class RealTimeVisualizer implements Visualizer {
           mode: 'markers',
           marker: {
             color: uni.color,
-            sizemin: minShowRadius,
-            size: uni.currState.bodies.map((body) => extrapolateRadius(
-              body.radius,
-              minRadius,
-              maxRadius,
-              minShowRadius,
-              maxShowRadius,
-            )),
+            sizemin: 5,
+            size: uni.currState.bodies.map((body) => body.radius * uni.radiusScale),
           },
         };
         if (this.simulation.getShowTrails()) {
@@ -329,14 +297,8 @@ export class RealTimeVisualizer implements Visualizer {
             hovertext: uni.currState.bodies.map((body) => body.label),
             marker: {
               color: uni.color,
-              sizemin: minShowRadius,
-              size: uni.currState.bodies.map((body) => extrapolateRadius(
-                body.radius,
-                minRadius,
-                maxRadius,
-                minShowRadius,
-                maxShowRadius,
-              )),
+              size: uni.currState.bodies.map((body) => body.radius * uni.radiusScale),
+              sizemin: 5,
             },
             mode: 'markers',
           };
@@ -563,18 +525,12 @@ export class RealTimeVisualizer3D implements Visualizer {
     }
     element.style.position = 'relative';
     let maxLength = 0;
-    let maxRadius = 0;
-    let minRadius = Infinity;
     this.simulation.universes.forEach((u) => u.currState.bodies.forEach((b) => {
       for (let i = 0; i < 3; i++) {
         maxLength = Math.max(maxLength, Math.abs(b.position.getComponent(i)));
       }
-      minRadius = Math.min(minRadius, b.radius);
-      maxRadius = Math.max(maxRadius, b.radius);
     }));
     const scale = 0.5 * Math.min(height, width) / maxLength;
-    const minShowRadius = 0.015 * Math.min(height, width);
-    const maxShowRadius = 0.04 * Math.min(height, width);
     this.scene = new THREE.Scene();
 
     const camera = new THREE.OrthographicCamera(
@@ -645,7 +601,7 @@ export class RealTimeVisualizer3D implements Visualizer {
       );
       u.currState.bodies.forEach((b, i) => {
         const sph = new THREE.SphereGeometry(
-          extrapolateRadius(b.radius, minRadius, maxRadius, minShowRadius, maxShowRadius),
+          b.radius * scale * u.radiusScale,
           12,
           12,
         );
@@ -899,17 +855,11 @@ export class RecordingVisualizer implements Visualizer {
     }
     let maxWidth = 0;
     let maxHeight = 0;
-    let maxRadius = 0;
-    let minRadius = Infinity;
     this.simulation.universes.forEach((u) => u.currState.bodies.forEach((b) => {
       maxWidth = Math.max(maxWidth, Math.abs(b.position.x));
       maxHeight = Math.max(maxHeight, Math.abs(b.position.y));
-      minRadius = Math.min(minRadius, b.radius);
-      maxRadius = Math.max(maxRadius, b.radius);
     }));
     const scale = 0.5 * Math.min(height / maxHeight, width / maxWidth);
-    const minShowRadius = 0.01 * Math.min(height, width);
-    const maxShowRadius = 0.05 * Math.min(height, width);
 
     const recordedFrames: State[][] = [];
     const totalFrames = this.simulation.maxFrameRate * recordFor;
@@ -971,14 +921,8 @@ export class RecordingVisualizer implements Visualizer {
           mode: 'markers',
           marker: {
             color: uni.color,
-            sizemin: minShowRadius,
-            size: uni.currState.bodies.map((body) => extrapolateRadius(
-              body.radius,
-              minRadius,
-              maxRadius,
-              minShowRadius,
-              maxShowRadius,
-            )),
+            sizemin: 5,
+            size: uni.currState.bodies.map((body) => body.radius * uni.radiusScale),
           },
         };
         if (this.simulation.getShowTrails()) {
@@ -1040,14 +984,8 @@ export class RecordingVisualizer implements Visualizer {
             hovertext: currState.bodies.map((body) => body.label),
             marker: {
               color: uni.color,
-              sizemin: minShowRadius,
-              size: uni.currState.bodies.map((body) => extrapolateRadius(
-                body.radius,
-                minRadius,
-                maxRadius,
-                minShowRadius,
-                maxShowRadius,
-              )),
+              sizemin: 5,
+              size: uni.currState.bodies.map((body) => body.radius * uni.radiusScale),
             },
             mode: 'markers',
           };
@@ -1208,18 +1146,12 @@ export class RecordingVisualizer3D implements Visualizer {
       return;
     }
     let maxLength = 0;
-    let maxRadius = 0;
-    let minRadius = Infinity;
     this.simulation.universes.forEach((u) => u.currState.bodies.forEach((b) => {
       for (let i = 0; i < 3; i++) {
         maxLength = Math.max(maxLength, Math.abs(b.position.getComponent(i)));
       }
-      minRadius = Math.min(minRadius, b.radius);
-      maxRadius = Math.max(maxRadius, b.radius);
     }));
     const scale = 0.5 * Math.min(height, width) / maxLength;
-    const minShowRadius = 0.015 * Math.min(height, width);
-    const maxShowRadius = 0.04 * Math.min(height, width);
     this.scene = new THREE.Scene();
 
     const camera = new THREE.OrthographicCamera(
@@ -1278,7 +1210,7 @@ export class RecordingVisualizer3D implements Visualizer {
       );
       u.currState.bodies.forEach((b, i) => {
         const sph = new THREE.SphereGeometry(
-          extrapolateRadius(b.radius, minRadius, maxRadius, minShowRadius, maxShowRadius),
+          b.radius * scale * u.radiusScale,
           12,
           12,
         );
@@ -1419,6 +1351,7 @@ export class RecordingVisualizer3D implements Visualizer {
           c.material.dispose();
         });
       });
+      renderer.domElement.remove();
     };
     this.animationId = requestAnimationFrame(paint);
   }
