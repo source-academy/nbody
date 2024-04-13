@@ -1,6 +1,6 @@
 # nbody
 
-JS/TS library to run n-body simulations on the browser. Documentation available [here](https://source-academy.github.io/nbody/api)
+JS/TS library to run n-body simulations on the browser. Documentation available [here](https://source-academy.github.io/nbody).
 
 ## Installation
 
