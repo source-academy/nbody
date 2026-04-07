@@ -76,7 +76,7 @@
     "three": "^0.163.0",
     "typedoc": "^0.25.12",
     "typescript": "^5.4.2",
-    "vite": "^5.2.8"
+    "vite": "^6.4.2"
   },
   "peerDependencies": {
     "@types/plotly.js": "^2.29.2",
